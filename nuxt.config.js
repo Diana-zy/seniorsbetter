@@ -20,7 +20,7 @@ export default {
       const path = await pathData.json();
       const categoryPaths = path.data.category.map((item) => `/category/${item}/`);
       const detailPaths = path.data.detail.map((item) => `/detail/${item}/`);
-      const urls = [...categoryPaths, ...detailPaths, "/detail2/1/", "/detail3/1/"];
+      const urls = [...categoryPaths, ...detailPaths];
       return urls;
     }
   },
@@ -32,7 +32,7 @@ export default {
     trailingSlash: true
   },
   head: {
-    title: "Intelinfor - world news in the palm of your hand!",
+    title: "Hacksforhome - world news in the palm of your hand!",
     meta: [
       {
         name: "version",
@@ -65,7 +65,7 @@ export default {
       {
         hid: "og:site_name",
         property: "og:site_name",
-        content: "Intelinfor"
+        content: "Hacksforhome"
       }
     ],
     link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
@@ -90,17 +90,17 @@ export default {
   },
   modules: ["@nuxtjs/axios"],
   sitemap: {
-    hostname: "https://intelinfor.com/"
+    hostname: "https://hacksforhome.com/"
   },
   pwa: {
     manifest: {
-      name: "Intelinfor",
-      short_name: "Intelinfor",
+      name: "Hacksforhome",
+      short_name: "Hacksforhome",
       description:
         "We are committed to delivering you the latest developments in various fields, including politics, economy, technology, culture, sports, and more.!"
     },
     icon: {
-      source: "./static/icon.png", // 应用图标路径
+      source: "/static/icon.png", // 应用图标路径
       fileName: "icon.png", // 生成的图标名称
       sizes: [32, 64, 120, 144, 152, 192, 512] // 自定义生成的图标尺寸
     }

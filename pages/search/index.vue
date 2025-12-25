@@ -2,8 +2,6 @@
   <div class="page">
     <Header />
     <main class="main">
-      <div id="afscontainer1"> </div>
-      <div id="relatedsearches1"> </div>
       <h3 class="title-h3">Web Results</h3>
       <section class="news-box-3">
         <news-item-3 v-for="(item, i) in news" :key="i" :item="item"> </news-item-3>
@@ -23,25 +21,13 @@ export default {
     };
   },
   mounted() {
-    window.handleRequestAdByChannel("first", 3, true);
-
     const searchParams = new URLSearchParams(window.location.search);
     this.channelId = searchParams.has("channel") ? searchParams.get("channel") : "";
 
     this.input = this.$route.query.query || "";
-    this.input && this.addAdSense();
     this.input && this.searchNews();
   },
   methods: {
-    addAdSense() {
-      setTimeout(() => {
-        if (window.handleRequestAdByChannel("", "", true)) {
-          window.trackEventToPixel("Q_AR");
-          window.pushEventParamsToGtm("Q_AR");
-          this.addAdSenseScript();
-        }
-      }, 0);
-    },
     async searchNews() {
       try {
         if (this.channelId) {
@@ -62,78 +48,6 @@ export default {
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-    },
-
-    addAdSenseScript() {
-      const queryString = this.input;
-
-      const channelId = window.getParam("channel");
-      const hiSource = window.getParam("hi_source");
-      const hiPc = window.getParam("hi_pc");
-      const resultsPageBaseUrl = window.getResultsPageUrl({
-        channel: channelId,
-        from: "search",
-        hi_source: hiSource,
-        hi_pc: hiPc
-      });
-      const adSenseConfig = {
-        channel: channelId,
-        pubId: "partner-pub-1853000876464912",
-        query: queryString,
-        styleId: "7223178098",
-        adsafe: "low",
-        ivt: false,
-        resultsPageBaseUrl,
-        resultsPageQueryParam: "query"
-      };
-
-      // AdSense 加载回调函数
-      const adLoadedCallback =
-        (eventName, additionalData = {}) =>
-        (loaded, response) => {
-          if (response) {
-            // eslint-disable-next-line no-undef
-            dataLayer.push({ event: eventName, ...additionalData });
-          }
-        };
-
-      const adblock1 = {
-        container: "afscontainer1",
-        number: 8,
-        adLoadedCallback: (loaded, e) => {
-          if (e) {
-            window.trackEventToPixel("C_AR");
-
-            window.pushEventParamsToGtm("C_AR");
-            try {
-              const element = document.getElementById("master-1");
-              const height = parseFloat(element.style.height);
-              const result = Math.round(height / 456);
-              // eslint-disable-next-line no-undef
-              dataLayer.push({ event: "C_AR_IN", num: result, query: queryString });
-            } catch (error) {
-              console.error(error);
-            }
-          } else {
-            // eslint-disable-next-line no-undef
-            dataLayer.push({ event: "FF_AR", query: queryString });
-          }
-        }
-      };
-
-      // 根据来源配置 rsblock1
-      const rsblock1 = (() => {
-        const baseConfig = {
-          container: "relatedsearches1",
-          relatedSearches: 5,
-          adLoadedCallback: adLoadedCallback("C_AC", { query: queryString })
-        };
-
-        return baseConfig;
-      })();
-
-      // eslint-disable-next-line no-undef
-      _googCsa("ads", adSenseConfig, adblock1, rsblock1);
     }
   }
 };

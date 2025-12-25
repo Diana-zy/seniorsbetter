@@ -17,13 +17,11 @@
         </ul>
       </div>
 
-      <div class="search-box">
-        <!-- <transition name="slide"> -->
+      <!-- <div class="search-box">
         <input v-model="input" placeholder="Search..." class="search" @keyup.enter="search" />
-        <!-- </transition> -->
         <i v-show="input != ''" class="icon-clear" @click="clear"></i>
         <i class="icon-search" @click="search"></i>
-      </div>
+      </div> -->
 
       <!-- <CustomLink to="/us/" class="contact">Contact Us</CustomLink> -->
 
@@ -110,7 +108,7 @@ export default {
 }
 @media screen and (max-width: 750px) {
   .home-page .logo {
-    width: vw(250) !important;
+    width: vw(403) !important;
     background-image: url("~/assets/images/logo.png") !important;
   }
 }
@@ -149,8 +147,8 @@ export default {
   }
 }
 .logo {
-  width: 166px;
-  height: 40px;
+  width: 202px;
+  height: 30px;
   @include bg("logo.png");
   margin-right: 56px;
 }

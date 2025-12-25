@@ -4,7 +4,6 @@
     <article class="article">
       <h1 class="article-title" style="">{{ newInfo.name }}</h1>
       <div class="news-detail first_paragraph">{{ newInfo.first_paragraph }}</div>
-      <div id="relatedsearches1"> </div>
       <NuxtImg
         format="auto"
         fit="cover"
@@ -15,11 +14,9 @@
         preload
       />
       <!-- eslint-disable vue/no-v-html -->
-      <!-- <div class="news-detail" v-html="newInfo.content"></div> -->
       <div class="news-detail">
         <template v-for="(item, index) in contentItems">
           <div v-if="item.type === 'content'" :key="`content-${index}`" v-html="item.content"></div>
-          <div v-else id="relatedsearches2" :key="`relatedsearch-${index}`"></div>
         </template>
       </div>
     </article>
@@ -61,7 +58,7 @@ export default {
       htmlAttrs: {
         lang: this.newInfo.language
       },
-      title: this.newInfo.name + " - Intelinfor",
+      title: this.newInfo.name + " - Hacksforhome",
       meta: [
         {
           hid: "description",
@@ -86,7 +83,7 @@ export default {
         {
           hid: "og:url",
           property: "og:url",
-          content: `https://intelinfor.com/detail/${this.newInfo.path}/`
+          content: `https://hacksforhome.com/detail/${this.newInfo.path}/`
         },
         {
           hid: "og:locale",
@@ -151,7 +148,6 @@ export default {
     }
   },
   mounted: function () {
-    window.handleRequestAdByChannel("mounted", 1);
     // 获取 URL 查询参数
     const searchParams = new URLSearchParams(window.location.search);
     // AdSense 配置参数
@@ -167,165 +163,8 @@ export default {
         window.history.replaceState({}, "", newUrl);
       }
     }
-
-    const buffer = window.getCookie("pathInfo");
-    if (!buffer || Number(JSON.parse(buffer)[window.location.pathname]) < 3) {
-      setTimeout(() => {
-        this.newInfo.no_entry !== 1 && this.addAdSenseScript();
-      }, 0);
-    }
   },
-  methods: {
-    addAdSenseScript() {
-      // 获取 URL 查询参数
-      const searchParams = new URLSearchParams(window.location.search);
-      let terms = searchParams.has("terms") ? searchParams.get("terms") : "";
-      terms = terms.replace(/[，]/g, ",");
-      // 获取Url携带的headline参数
-      let headline = searchParams.has("headline") ? searchParams.get("headline") : "";
-      const errorHeadlines = [
-        "{title}",
-        "{{ad_title}}",
-        "%7B%7Bad_title%7D%7D",
-        "%257B%257Bad_title%257D%257D",
-        "%257b%257bad_title%257d%257d"
-      ];
-      if (errorHeadlines.includes(headline)) {
-        headline = "";
-        // 单独对以下两个渠道号，有问题的headline进行替换
-        const editHeadlineChannels = {
-          5373731044:
-            "Don’t Let Payment Issues Disrupt Your Service – Update Now! Your Card Payment Has Failed?",
-          6554482555:
-            "Manage money easy: digital bank accounts. Tired of in-branch waits? Go digital!",
-          1015215411:
-            "Bright teeth, no enamel harm! Want a bright smile safely? Try enamel whitening toothpaste. BEFORE AFTER SMILE BRIGHTER WITH US Advanced Dental Technology. BRIGHT SMILES, HEALTHY TEETH Professional Dental Care for You. Advanced Dental CareFluoride Protection & Fresh Mint",
-          2740480180:
-            "Pro movers do packing, transport. Choose right, relocate worry-free. Moving home/business? Trust pro movers.",
-          8715124928:
-            "Use corporate gas cards: save money. Corporate gas cards: cut costs, boost efficiency, plus employee perks.",
-          1028206592:
-            "For lung cancer—understand it, catch signs early, access support. Fight lung cancer better. Normal Tissue Tumor Growth. LUNG CANCER RESEARCH TRIAL INNOVATING TREATMENTS THROUGH SCIENCE Learn more. HEALTHY LUNG VSCANCER LUNG HEALTHY:Normal tissue, Clear airways No abnormalities CANCER:Malignant tumors, Damagedtissue, lrregular growth",
-          1427398519:
-            "Bundles bring convenience, cost cuts, and hassle-free single billing. Need essential internet + phone for home or small business?"
-        };
-        const channelId = window.getParam("channel");
-        if (editHeadlineChannels[channelId]) {
-          headline = editHeadlineChannels[channelId];
-          window.dataLayer.push({
-            event: "Headline_Replace",
-            headline
-          });
-        }
-      }
-
-      const paramKeys = [];
-      // 遍历查询参数并将其添加到 paramKeys 数组中
-      for (const param of searchParams) {
-        paramKeys.push(param[0]);
-      }
-      const ignoredPageParams = paramKeys.join(",");
-
-      const channelId = window.getParam("channel");
-      const hiSource = window.getParam("hi_source");
-      const hiPc = window.getParam("hi_pc");
-      const resultsPageBaseUrl = window.getResultsPageUrl({
-        channel: channelId,
-        from: "detail",
-        hi_source: hiSource,
-        hi_pc: hiPc
-      });
-      const adSenseConfig = {
-        channel: this.channelId,
-        pubId: "partner-pub-1853000876464912",
-        styleId: "7223178098",
-        adsafe: "low",
-        ignoredPageParams,
-        relatedSearchTargeting: "content",
-        resultsPageBaseUrl,
-        resultsPageQueryParam: "query",
-        terms: terms || this.newInfo.terms,
-        referrerAdCreative: headline || terms || this.newInfo.referrer_ad_creative,
-        ivt: false
-      };
-
-      // 初始化 _googCsa 并加载相关搜索广告
-      // eslint-disable-next-line no-undef
-      _googCsa(
-        "relatedsearch",
-        adSenseConfig,
-        {
-          container: "relatedsearches1", // 广告容器 ID
-          relatedSearches: 5, // 相关搜索广告数量
-          adLoadedCallback: function (loaded, response, isExperimentVariant, callbackOptions) {
-            if (response) {
-              window.trackEventToPixel("D_C_AC");
-
-              window.pushEventParamsToGtm("C_AC");
-              window.handleRequestAdByChannel("query_ad", 1);
-              try {
-                let numberOfKeys = 0;
-                let concatenatedKeys = "miss";
-                if (callbackOptions.termPositions) {
-                  const keys = Object.keys(callbackOptions.termPositions);
-                  numberOfKeys = keys.length;
-                  concatenatedKeys = keys.join(",");
-                }
-
-                const element = document.getElementById("master-1");
-                const height = parseFloat(element.style.height);
-                const result = Math.round(height / 105);
-
-                // eslint-disable-next-line no-undef
-                dataLayer.push({
-                  event: "C_AC_IN",
-                  queryNum: 5,
-                  num: result,
-                  key1: numberOfKeys,
-                  key2: concatenatedKeys
-                }); // 事件推送到 dataLayer
-              } catch (e) {
-                console.log(e);
-              }
-            }
-          }
-        },
-        {
-          container: "relatedsearches2", // 广告容器 ID
-          relatedSearches: 5, // 相关搜索广告数量
-          adLoadedCallback: function (loaded, response, isExperimentVariant, callbackOptions) {
-            if (response) {
-              // eslint-disable-next-line no-undef
-              dataLayer.push({ event: "C_AC_SECOND" }); // 事件推送到 dataLayer
-              try {
-                let numberOfKeys = 0;
-                let concatenatedKeys = "miss";
-                if (callbackOptions.termPositions) {
-                  const keys = Object.keys(callbackOptions.termPositions);
-                  numberOfKeys = keys.length;
-                  concatenatedKeys = keys.join(",");
-                }
-                const element = document.getElementById("relatedsearches2");
-                const height = parseFloat(element.clientHeight);
-                const result = Math.round(height / 105);
-
-                // eslint-disable-next-line no-undef
-                dataLayer.push({
-                  event: "C_AC_IN_SECOND",
-                  queryNum: 5,
-                  num: result,
-                  key1: numberOfKeys,
-                  key2: concatenatedKeys
-                }); // 事件推送到 dataLayer
-              } catch (e) {
-                console.log(e);
-              }
-            }
-          }
-        }
-      );
-    }
-  }
+  methods: {}
 };
 </script>
 

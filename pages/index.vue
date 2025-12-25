@@ -2,7 +2,7 @@
   <div class="page home-page">
     <Header />
     <main class="main">
-      <section class="home-search">
+      <!-- <section class="home-search">
         <div class="search-group">
           <input
             v-model="input"
@@ -14,7 +14,7 @@
           <i v-show="input != ''" class="icon-clear" @click="clear"></i>
           <i class="icon-search" @click="search"></i>
         </div>
-      </section>
+      </section> -->
 
       <section v-swiper:mySwiper="swiperOption" class="swiper-box">
         <div class="swiper-wrapper">
