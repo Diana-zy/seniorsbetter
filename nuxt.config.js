@@ -32,7 +32,7 @@ export default {
     trailingSlash: true
   },
   head: {
-    title: "Hacksforhome - world news in the palm of your hand!",
+    title: "Seniorsbetter - world news in the palm of your hand!",
     meta: [
       {
         name: "version",
@@ -65,7 +65,7 @@ export default {
       {
         hid: "og:site_name",
         property: "og:site_name",
-        content: "Hacksforhome"
+        content: "Seniorsbetter"
       }
     ],
     link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
@@ -90,12 +90,12 @@ export default {
   },
   modules: ["@nuxtjs/axios"],
   sitemap: {
-    hostname: "https://hacksforhome.com/"
+    hostname: "https://seniorsbetter.com/"
   },
   pwa: {
     manifest: {
-      name: "Hacksforhome",
-      short_name: "Hacksforhome",
+      name: "Seniorsbetter",
+      short_name: "Seniorsbetter",
       description:
         "We are committed to delivering you the latest developments in various fields, including politics, economy, technology, culture, sports, and more.!"
     },

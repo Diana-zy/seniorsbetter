@@ -58,7 +58,7 @@ export default {
       htmlAttrs: {
         lang: this.newInfo.language
       },
-      title: this.newInfo.name + " - Hacksforhome",
+      title: this.newInfo.name + " - Seniorsbetter",
       meta: [
         {
           hid: "description",
@@ -83,7 +83,7 @@ export default {
         {
           hid: "og:url",
           property: "og:url",
-          content: `https://hacksforhome.com/detail/${this.newInfo.path}/`
+          content: `https://seniorsbetter.com/detail/${this.newInfo.path}/`
         },
         {
           hid: "og:locale",
