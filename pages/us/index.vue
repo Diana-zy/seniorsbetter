@@ -3,7 +3,7 @@
     <Header />
     <main class="main">
       <h1>Contact Us</h1>
-      <p>Please feel free to contact us at service@seniorsbetter.com </p>
+      <p>Please feel free to contact us at service@koureishalife.com </p>
     </main>
     <Footer />
   </div>

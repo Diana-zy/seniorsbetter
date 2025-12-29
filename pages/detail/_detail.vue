@@ -58,7 +58,7 @@ export default {
       htmlAttrs: {
         lang: this.newInfo.language
       },
-      title: this.newInfo.name + " - Seniorsbetter",
+      title: this.newInfo.name + " - Koureishalife",
       meta: [
         {
           hid: "description",
@@ -83,7 +83,7 @@ export default {
         {
           hid: "og:url",
           property: "og:url",
-          content: `https://seniorsbetter.com/detail/${this.newInfo.path}/`
+          content: `https://koureishalife.com/detail/${this.newInfo.path}/`
         },
         {
           hid: "og:locale",

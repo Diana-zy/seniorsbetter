@@ -32,7 +32,7 @@ export default {
     trailingSlash: true
   },
   head: {
-    title: "Seniorsbetter - world news in the palm of your hand!",
+    title: "Koureishalife - world news in the palm of your hand!",
     meta: [
       {
         name: "version",
@@ -65,7 +65,7 @@ export default {
       {
         hid: "og:site_name",
         property: "og:site_name",
-        content: "Seniorsbetter"
+        content: "Koureishalife"
       }
     ],
     link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
@@ -90,12 +90,12 @@ export default {
   },
   modules: ["@nuxtjs/axios"],
   sitemap: {
-    hostname: "https://seniorsbetter.com/"
+    hostname: "https://koureishalife.com/"
   },
   pwa: {
     manifest: {
-      name: "Seniorsbetter",
-      short_name: "Seniorsbetter",
+      name: "Koureishalife",
+      short_name: "Koureishalife",
       description:
         "We are committed to delivering you the latest developments in various fields, including politics, economy, technology, culture, sports, and more.!"
     },

@@ -20,13 +20,13 @@
           >
             {{ cookiesText[lang] }}
           </CustomLink>
-          <a href="mailto:service@seniorsbetter.com">
+          <a href="mailto:service@koureishalife.com">
             {{ contactText[lang] }}
           </a>
         </div>
         <span>
           {{ copyRightText1[lang] }}
-          ©&nbsp; 2024 Seniorsbetter &nbsp;
+          ©&nbsp; 2024 Koureishalife &nbsp;
           {{ copyRightText2[lang] }}
         </span>
       </div>

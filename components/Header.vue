@@ -108,7 +108,7 @@ export default {
 }
 @media screen and (max-width: 750px) {
   .home-page .logo {
-    width: vw(322) !important;
+    width: vw(288) !important;
     height: vw(40) !important;
     background-image: url("~/assets/images/logo.png") !important;
   }
@@ -148,7 +148,7 @@ export default {
   }
 }
 .logo {
-  width: 242px;
+  width: 215px;
   height: 30px;
   @include bg("logo.png");
   margin-right: 56px;
