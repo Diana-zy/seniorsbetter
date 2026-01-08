@@ -1,7 +1,7 @@
 <template>
   <CustomLink class="news-style-1" :to="`/detail/${item.path}/`">
     <NuxtImg
-      format="auto"
+      format="webp"
       fit="cover"
       width="366"
       height="244"
@@ -11,13 +11,14 @@
       class="img m-hidden"
     />
     <NuxtImg
-      format="auto"
+      format="webp"
       fit="cover"
       width="491"
       height="275"
       :src="item.cover"
       :alt="item.name"
-      loading="lazy"
+      :loading="index == 0 ? 'eager' : 'lazy'"
+      :fetchpriority="index == 0 ? 'high' : 'auto'"
       class="img pc-hidden"
     />
     <p class="title">{{ item.name }}</p>
@@ -30,6 +31,10 @@ export default {
   props: {
     item: {
       type: Object,
+      required: true
+    },
+    index: {
+      type: Number,
       required: true
     }
   }

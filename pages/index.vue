@@ -18,7 +18,13 @@
 
       <section v-swiper:mySwiper="swiperOption" class="swiper-box">
         <div class="swiper-wrapper">
-          <news-item-1 v-for="(item, i) in recNews.list" :key="i" class="swiper-slide" :item="item">
+          <news-item-1
+            v-for="(item, i) in recNews.list"
+            :key="i"
+            class="swiper-slide"
+            :item="item"
+            :index="i"
+          >
           </news-item-1>
         </div>
       </section>
