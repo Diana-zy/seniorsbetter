@@ -7,7 +7,7 @@
       <div class="search-box">
         <input
           v-model="input"
-          placeholder="Search..."
+          :placeholder="searchText[lang] || searchText['en']"
           class="search"
           name="search"
           @keyup.enter="search"
@@ -16,17 +16,19 @@
         <i class="icon-search" @click="search"></i>
       </div>
 
-      <h2 class="title-h2">Category</h2>
+      <h2 class="title-h2">{{ categoryText[lang] || categoryText['en'] }}</h2>
       <ul class="categories">
         <li v-for="(item, i) in navData.list" :key="i">
-          <CustomLink :to="`/category/${item.path}/`">{{
-            capitalizeFirstLetter(item.locale_name.en)
+          <CustomLink :to="`/category/${item.path}/`">}{{
+            capitalizeFirstLetter(item.name)
           }}</CustomLink>
         </li>
       </ul>
-      <div v-if="showInstallButton" class="download" @click="installPWA"
-        ><i class="icon-download" />Download</div
-      >
+
+      <div v-if="showInstallButton" class="btn-download" @click="installPWA">
+        <i class="icon-pwa"></i>
+        <span>{{ downloadText[lang] || downloadText['en'] }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -43,28 +45,35 @@ export default {
     navData: {
       type: Object,
       default: () => ({})
+    },
+    lang: {
+      type: String,
+      default: "en"
     }
   },
   data() {
     return {
+      input: "",
+      deferredPrompt: null,
       showInstallButton: false,
-      input: ""
+      recKeywords: this.$recKeywords,
+      searchText: {
+        en: "Search...",
+        ja: "検索けんさく..."
+      },
+      categoryText: {
+        en: "Categories",
+        ja: "カテゴリ"
+      },
+      downloadText: {
+        en: "Download",
+        ja: "ダウンロード"
+      }
     };
   },
+
   mounted() {
-    // 判断是否支持 PWA
-    if ("serviceWorker" in navigator && "PushManager" in window) {
-      if (window.deferredPrompt) {
-        this.deferredPrompt = window.deferredPrompt;
-        this.showInstallButton = true;
-      } else {
-        window.addEventListener("beforeinstallprompt", (e) => {
-          e.preventDefault();
-          this.deferredPrompt = e;
-          this.showInstallButton = true;
-        });
-      }
-    }
+    this.checkCanInstallPwa();
   },
   methods: {
     capitalizeFirstLetter,
@@ -78,6 +87,30 @@ export default {
       }
       simulateAFSSearch(this.input);
     },
+    closeSidebar() {
+      this.$emit("close");
+    },
+    clear() {
+      this.input = "";
+    },
+    handleSearchRecKeyword(keyword) {
+      this.input = keyword;
+      simulateAFSSearch(keyword);
+    },
+    checkCanInstallPwa() {
+      if ("serviceWorker" in navigator && "PushManager" in window) {
+        if (window.deferredPrompt) {
+          this.deferredPrompt = window.deferredPrompt;
+          this.showInstallButton = true;
+        } else {
+          window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            this.deferredPrompt = e;
+            this.showInstallButton = true;
+          });
+        }
+      }
+    },
     installPWA() {
       if (this.deferredPrompt) {
         this.deferredPrompt.prompt();
@@ -85,12 +118,6 @@ export default {
           this.deferredPrompt = null;
         });
       }
-    },
-    closeSidebar() {
-      this.$emit("close");
-    },
-    clear() {
-      this.input = "";
     }
   }
 };
@@ -109,7 +136,7 @@ export default {
 .sidebar {
   position: fixed;
   top: 0;
-  right: 0;
+  left: 0;
   height: 100%;
   width: vw(670);
   background: #fff;
@@ -126,12 +153,12 @@ export default {
   }
 }
 .sidebar-hidden {
-  transform: translateX(100%);
+  transform: translateX(-100%);
 }
 .close {
   position: absolute;
   top: vw(24);
-  right: vw(46);
+  left: vw(46);
   @include icon(vw(48), vw(48), "icon-close.png");
 }
 .title-h2 {
@@ -139,7 +166,7 @@ export default {
 }
 .categories {
   li a {
-    font-family: "se3";
+    font-family: "rs";
     font-size: vw(32);
     height: vw(80);
     display: flex;
@@ -147,31 +174,50 @@ export default {
     padding-left: vw(46);
     cursor: pointer;
     &:hover {
+      font-family: "rssb";
       background: rgba($color1, 0.2);
       color: $color1;
-      text-decoration: underline;
     }
   }
 }
+.btn-download {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: vw(96);
+  border-top: 1px solid #ececee;
+  padding-left: vw(46);
+  display: flex;
+  align-items: center;
+  i {
+    @include icon(vw(40), vw(40), "icon-pwa-m.png");
+    margin-right: vw(12);
+  }
+  span {
+    font-family: "rssb";
+    font-size: vw(32);
+    color: $color1;
+  }
+}
 .search-box {
-  display: block;
   visibility: visible;
   position: relative;
   max-width: vw(578);
   height: vw(80);
   box-shadow: 0 0 vw(16) 0 rgba(0, 0, 0, 0);
-  border-radius: vw(8);
-  border: vw(2) solid $font3;
-  margin: vw(144) auto 0;
+  border-radius: vw(40);
+  border: vw(2) solid $color1;
+  margin: vw(144) auto vw(24);
   padding-left: vw(20);
   padding-right: vw(192);
 }
 .search {
   width: 100%;
   height: 100%;
-  font-family: "hem";
+  font-size: vw(24);
+  font-family: "rs";
   &::placeholder {
-    font-family: "her";
+    font-family: "rs";
     color: rgba($font1, 0.4);
   }
 }
@@ -181,13 +227,13 @@ export default {
   top: vw(-2);
   display: block;
   background: $color1;
-  border-radius: 0 vw(8) vw(8) 0;
-  @include btn-img(vw(128), vw(80), "icon-search.png");
+  border-radius: 0 vw(40) vw(40) 0;
+  @include btn-img(vw(128), vw(80), "icon-search-white.png");
   background-size: vw(48) vw(48);
 }
 .icon-clear {
   position: absolute;
-  right: vw(160);
+  right: vw(152);
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
@@ -195,69 +241,5 @@ export default {
   width: vw(28);
   height: vw(28);
   background-size: cover;
-}
-
-.words-container {
-  margin-top: vw(24);
-  width: 100%;
-  overflow: hidden;
-}
-
-.marquee {
-  display: flex;
-  overflow: hidden;
-  user-select: none;
-  gap: vw(32);
-}
-
-.marquee-group {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  gap: vw(32);
-  min-width: 100%;
-  animation: scrollLeft 50s linear infinite;
-}
-.hot-words {
-  font-family: "hem";
-  font-size: 12px;
-  line-height: 16px;
-  color: rgba(23, 23, 23, 0.6);
-  text-align: left;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.icon-arrow {
-  @include icon(12px, 12px, "icon-arrow.png");
-}
-
-@keyframes scrollLeft {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(calc(-100% - vw(32)));
-  }
-}
-
-.download {
-  position: absolute;
-  bottom: 0;
-  margin-top: auto;
-  width: 100%;
-  height: vw(96);
-  font-size: vw(32);
-  color: #f96606;
-  line-height: vw(40);
-  text-align: left;
-  @include center;
-  border-top: vw(2) solid rgba(23, 23, 23, 0.1);
-}
-.icon-download {
-  @include icon(vw(40), vw(40), "icon-download.png");
-  margin-right: vw(12);
 }
 </style>
