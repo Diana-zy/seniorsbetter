@@ -1,33 +1,59 @@
 <template>
   <header class="header">
-    <CustomLink to="/" class="logo"></CustomLink>
-    <div class="menu">
-      <div v-if="showInstallButton" class="pwa-download" @click="installPWA">
-        <i class="icon-pwa"></i>
+    <div class="header-top">
+      <CustomLink to="/" class="logo"></CustomLink>
+      <h1 v-if="pageTitle" class="site-h1">{{ pageTitle }}</h1>
+      <div class="search-box m-hidden-block">
+        <input v-model="input" placeholder="Search..." class="search" @keyup.enter="search" />
+        <i v-show="input != ''" class="icon-clear" @click="clear"></i>
+        <i class="icon-search" @click="search"></i>
       </div>
-
-      <div class="category"
-        >Category
+    </div>
+    <div class="menu">
+      <div class="category">
         <ul class="dropdown">
-          <li v-for="(item, i) in navData.list" :key="i"
-            ><CustomLink :to="`/category/${item.path}/`">{{
-              capitalizeFirstLetter(item.locale_name.en)
+          <li v-for="(item, i) in navData && navData.list && navData.list.slice(0, 6)" :key="i"
+            ><CustomLink :to="`/category/${item.path}/`">}{{
+              capitalizeFirstLetter(item.name)
             }}</CustomLink></li
           >
         </ul>
       </div>
 
-      <!-- <div class="search-box">
-        <input v-model="input" placeholder="Search..." class="search" @keyup.enter="search" />
-        <i v-show="input != ''" class="icon-clear" @click="clear"></i>
-        <i class="icon-search" @click="search"></i>
-      </div> -->
-
-      <!-- <CustomLink to="/us/" class="contact">Contact Us</CustomLink> -->
-
-      <div class="pc-hidden">
-        <div class="icon-sidebar" @click="toggleSidebar"> </div>
-        <Sidebar :is-open="isSidebarOpen" :nav-data="navData" @close="closeSidebar" />
+      <div class="search-m-box pc-hidden-flex">
+        <i class="icon-search" :class="{ 'show-close': showSearch }" @click="handleOpenSearch"></i>
+        <div class="pc-hidden-block">
+          <div class="icon-sidebar" :class="{ 'show-close': isSidebarOpen }" @click="toggleSidebar">
+          </div>
+        </div>
+        <transition name="opacity">
+          <div class="mask" @click="handleClickMask" v-show="isSidebarOpen || showSearch">
+            <transition name="slide">
+              <div class="menu-nav-list" v-show="isSidebarOpen">
+                <ul>
+                  <li v-for="item in navData && navData.list" :key="item.path">
+                    <CustomLink :to="`/category/${item.path}/`">}{{
+                      capitalizeFirstLetter(item.name)
+                    }}</CustomLink>
+                  </li>
+                </ul>
+              </div>
+            </transition>
+            <transition name="slide">
+              <div class="menu-nav-list" v-show="showSearch">
+                <div class="search-box-nav" @click.stop="handleClick">
+                  <input
+                    v-model="input"
+                    placeholder="Search..."
+                    class="search-nav"
+                    @keyup.enter="search"
+                  />
+                  <i v-show="input != ''" class="icon-clear-nav" @click="clear"></i>
+                  <i class="icon-search-nav" @click="search"></i>
+                </div>
+              </div> </transition
+          ></div>
+        </transition>
       </div>
     </div>
   </header>
@@ -41,21 +67,24 @@ export default {
     categories: {
       type: Array,
       default: () => []
+    },
+    pageTitle: {
+      type: String,
+      default: ""
     }
   },
   data() {
     return {
       input: "",
-      searchInput: "",
       deferredPrompt: null,
       showInstallButton: false,
       isSidebarOpen: false,
+      showSearch: false,
       navData: this.$root.$options.navData || this.$navData
     };
   },
   mounted() {
     this.input = this.$route.query.query || "";
-    // 判断是否支持 PWA
     if ("serviceWorker" in navigator && "PushManager" in window) {
       if (window.deferredPrompt) {
         this.deferredPrompt = window.deferredPrompt;
@@ -71,6 +100,20 @@ export default {
   },
   methods: {
     capitalizeFirstLetter,
+    handleOpenSearch() {
+      this.isSidebarOpen = false;
+      this.showSearch = !this.showSearch;
+      if (this.showSearch) {
+        document.body.classList.add("no-scroll");
+      } else {
+        document.body.classList.remove("no-scroll");
+      }
+    },
+    handleClickMask() {
+      this.showSearch = false;
+      this.isSidebarOpen = false;
+      document.body.classList.remove("no-scroll");
+    },
     search() {
       if (this.input.length < 1) {
         this.$globalMethod.showNotification({
@@ -90,87 +133,89 @@ export default {
       }
     },
     toggleSidebar() {
+      this.showSearch = false;
       this.isSidebarOpen = !this.isSidebarOpen;
+      if (this.isSidebarOpen) {
+        document.body.classList.add("no-scroll");
+      } else {
+        document.body.classList.remove("no-scroll");
+      }
     },
     closeSidebar() {
       this.isSidebarOpen = false;
     },
+    handleClick() {},
     clear() {
       this.input = "";
     }
-    // 清空热词
   }
 };
 </script>
-<style lang="scss">
-.home-page .search-box {
-  display: none;
-}
-@media screen and (max-width: 750px) {
-  .home-page .logo {
-    width: vw(288) !important;
-    height: vw(40) !important;
-    background-image: url("~/assets/images/logo.png") !important;
-  }
-}
-</style>
-
 <style lang="scss" scoped>
-.toggle-button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.toggle-button:hover {
-  background-color: #0056b3;
-}
 .header {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   max-width: 1200px;
-  height: 72px;
-  margin-bottom: 32px;
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100vw;
-    height: 1px;
-    background-color: #ececee;
-    transform: translateX(-50%);
-    left: 50%;
+  height: 147px;
+  margin-bottom: 0px;
+  z-index: 11;
+  .header-top {
+    width: 100%;
+    height: 66px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    .logo {
+      display: block;
+      width: 265px;
+      height: 40px;
+      @include bg("logo.png");
+      margin-right: 0;
+    }
+    .site-h1 {
+      font-size: 11px !important;
+      font-weight: 700;
+      color: $font1;
+      white-space: nowrap;
+      line-height: 1;
+    }
   }
-}
-.logo {
-  width: 215px;
-  height: 30px;
-  @include bg("logo.png");
-  margin-right: 56px;
 }
 .menu {
   display: flex;
   align-items: center;
-}
-.pwa-download {
-  width: 32px;
-  height: 32px;
-  background: rgba($color1, 0.2);
-  border-radius: 850%;
-  @include center;
-  font-family: "hem";
-  color: $font2;
-}
-.icon-pwa {
-  @include icon(20px, 20px, "icon-pwa.png");
+  justify-content: space-between;
+  .category {
+    width: 100%;
+    overflow: hidden;
+    font-size: 16px;
+    line-height: 72px;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+    .dropdown {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 40px;
+      overflow-x: auto;
+    }
+    li {
+      white-space: nowrap;
+      flex: 1;
+      a {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
 }
 .search-box {
-  position: relative;
+  position: absolute;
+  top: 9px;
+  right: 0;
   width: 380px;
   height: 48px;
   box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0);
@@ -186,9 +231,9 @@ export default {
   left: 16px;
   width: 60%;
   height: 100%;
-  font-family: "hem";
+  font-family: "rs";
   &::placeholder {
-    font-family: "hem";
+    font-family: "rs";
     color: rgba($font1, 0.4);
   }
 }
@@ -205,147 +250,84 @@ export default {
 }
 .icon-search {
   position: absolute;
-  right: -1px;
-  top: -1px;
+  right: 13px;
+  top: 8px;
   display: block;
+  cursor: pointer;
   border-radius: 0 8px 8px 0;
-  background-color: $color1;
-  @include btn-img(64px, 48px, "icon-search.png");
+  @include icon(32px, 32px, "icon-search4.png");
   background-size: 32px 32px;
-}
-.category {
-  width: 100px;
-  height: 72px;
-  font-size: 16px;
-  line-height: 72px;
-  font-family: "hem";
-  text-align: right;
-  cursor: pointer;
-  position: relative;
-  z-index: 2;
-  // &:hover {
-  //   color: $color1;
-  // }
-}
-
-.category:hover .dropdown,
-.dropdown:hover {
-  display: block;
-}
-
-.dropdown {
-  display: none;
-  position: absolute;
-  top: 54px;
-  right: 34px;
-  transform: translateX(50%);
-  box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
-  border-radius: 8px 8px 8px 8px;
-  background: #fff;
-  overflow: hidden;
-}
-
-.dropdown li {
-  font-size: 16px;
-  font-family: "hem";
-  line-height: 40px;
-  text-align: left;
-  cursor: pointer;
-  white-space: nowrap;
-  a {
-    display: block;
-    width: 100%;
-    height: 100%;
-    padding: 0 16px;
-  }
 }
 
 .dropdown li:hover {
-  background: rgba($color1, 0.2);
   color: $color1;
 }
-.contact {
-  width: 116px;
-  height: 72px;
-  line-height: 72px;
-  font-size: 16px;
-  font-family: "hem";
-  color: $font1;
-  text-align: right;
-  cursor: pointer;
-}
-
-.slide-enter-active,
-.slide-leave-active {
-  transition: all 0.5s ease;
-}
-
-.slide-enter {
-  opacity: 0;
-  transform: translateY(40%);
-}
-
-.slide-leave-to {
-  transform: translateY(-40%);
-  opacity: 0;
-}
 @media screen and (max-width: 1100px) {
-  .contact {
-    display: none;
-  }
-  .logo {
-    margin-right: 60px;
-  }
-  .pwa-download {
-    width: 40px;
-    height: 40px;
-    span {
-      display: none;
-    }
-    i {
-      margin-right: 0;
-    }
-  }
-  .category {
-    margin-left: 24px;
-    width: auto;
-    .dropdown {
-      top: 64px;
-      right: 0;
-      transform: none;
-    }
+  .search-box {
+    width: 240px;
   }
 }
 @media screen and (max-width: 750px) {
   .header {
     width: 100%;
-    padding: 0;
+    padding: 0 vw(32);
     max-width: 100vw;
-    height: vw(96);
-    margin-bottom: vw(48);
-    &::after {
-      height: vw(2);
+    height: vw(114);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: vw(2) solid rgba($font3, 0.35);
+    z-index: 11;
+    .header-top {
+      height: auto;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: vw(4);
+      .logo {
+        width: vw(320);
+        height: vw(48);
+        @include bg("logo.png");
+        margin-right: 0;
+      }
+      .site-h1 {
+        font-size: 14px !important;
+        font-weight: 700;
+        color: $font1;
+        max-width: vw(460);
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        line-height: 1;
+      }
+    }
+  }
+  .menu-nav-list {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: vw(40) vw(32);
+    height: auto;
+    width: 100vw;
+    transition: all 0.6s;
+    overflow: hidden;
+    background-color: #fff;
+    z-index: 12;
+    font-family: "rs";
+    font-size: vw(32);
+    li {
+      padding: vw(16) 0;
+      line-height: vw(48);
+      border-bottom: vw(2) solid rgba($font3, 0.2);
+    }
+    a {
+      display: inline-block;
+      width: 100%;
     }
   }
   .contact,
   .category {
     display: none;
-  }
-  .logo {
-    width: vw(60);
-    height: vw(60);
-    @include bg("icon-logo-m.png");
-    margin-right: 0;
-  }
-  .pwa-download {
-    display: none;
-    span {
-      display: none;
-    }
-  }
-  .icon-pwa {
-    @include icon(vw(48), vw(48), "icon-pwa2.png");
-    margin-right: 0;
   }
   .icon-sidebar {
     @include icon(vw(48), vw(48), "icon-sidebar.png");
@@ -354,22 +336,24 @@ export default {
   .pc-hidden {
     margin-left: auto;
   }
-  .search-box {
-    max-width: vw(304);
+  .menu {
+    height: 100%;
+    width: auto;
+  }
+  .search-m-box {
+    width: auto;
     height: vw(64);
-    box-shadow: 0 0 vw(16) 0 rgba(0, 0, 0, 0);
-    border-radius: vw(8);
-    border: vw(2) solid $font3;
-    margin: 0 vw(24) 0 0;
-    padding-left: vw(20);
-    padding-right: vw(166);
+    display: flex;
+    align-items: center;
+    gap: vw(20);
   }
   .search {
-    width: 46%;
+    position: relative;
+    width: 100%;
     height: 100%;
-    font-family: "hem";
+    font-family: "rs";
     &::placeholder {
-      font-family: "hem";
+      font-family: "rs";
       color: rgba($font1, 0.4);
     }
   }
@@ -385,13 +369,60 @@ export default {
     background-size: cover;
   }
   .icon-search {
-    position: absolute;
-    right: vw(-2);
-    top: vw(-2);
+    top: 0;
+    right: 0;
+    position: relative;
     display: block;
-    border-radius: 0 vw(8) vw(8) 0;
-    @include btn-img(vw(80), vw(64), "icon-search.png");
+    border-radius: vw(8);
+    @include icon(vw(48), vw(48), "icon-search4.png");
     background-size: vw(48) vw(48);
+    background-color: transparent;
+  }
+  .search-box-nav {
+    position: relative;
+    width: 100%;
+    height: vw(80);
+    display: flex;
+    flex-wrap: nowrap;
+    .search-nav {
+      width: 100%;
+      border: vw(2) solid $font3;
+      border-radius: vw(12);
+      padding-left: vw(32);
+    }
+    .icon-clear-nav {
+      position: absolute;
+      right: vw(100);
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      background-image: url("~/assets/images/icon-clear.png");
+      width: vw(28);
+      height: vw(28);
+      background-size: cover;
+    }
+    .icon-search-nav {
+      position: absolute;
+      right: vw(32);
+      top: 50%;
+      transform: translateY(-50%);
+      display: block;
+      @include btn-img(vw(48), vw(48), "icon-search4.png");
+    }
+  }
+  .show-close {
+    @include icon(vw(48), vw(48), "icon-close.png");
+  }
+  .mask {
+    position: absolute;
+    top: vw(114);
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    background: rgba(#111, 0.7);
+    overflow: hidden;
+    pointer-events: all;
   }
 }
 </style>
