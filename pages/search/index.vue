@@ -104,9 +104,9 @@ export default {
       else if (hiSource === "outbrain") scid = dicbo || "unknown";
       const adSenseConfig = {
         channel: channelId,
-        pubId: "partner-pub-1853000876464912",
+        pubId: "partner-pub-6612490456597819",
         query: queryString,
-        styleId: "3911226554",
+        styleId: "6462282781",
         adsafe: "low",
         ivt: false,
         resultsPageBaseUrl,
