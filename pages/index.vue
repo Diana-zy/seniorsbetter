@@ -1,56 +1,44 @@
 <template>
   <div class="page home-page">
-    <Header />
+    <Header page-title="Global News &amp; Information" />
     <main class="main">
-      <!-- <section class="home-search">
-        <div class="search-group">
-          <input
-            v-model="input"
-            placeholder="Search..."
-            class="search"
-            name="search"
-            @keyup.enter="search"
-          />
-          <i v-show="input != ''" class="icon-clear" @click="clear"></i>
-          <i class="icon-search" @click="search"></i>
+      <div class="layout-left">
+        <section v-swiper:mySwiper="swiperOption" class="swiper-box">
+          <div class="swiper-wrapper">
+            <item-swiper-rec
+              v-for="(item, i) in recNews && recNews.list"
+              :key="i"
+              class="swiper-slide"
+              :item="item"
+              :index="i"
+            >
+            </item-swiper-rec>
+          </div>
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-button-next"></div>
+        </section>
+
+        <h2 class="title-new-tag">Latest Articles</h2>
+        <section class="news-box-new">
+          <item-text-new v-for="(item, i) in trendingNews && trendingNews.list" :key="i" :item="item">
+          </item-text-new>
+        </section>
+
+        <div v-for="(items, index) in categoryList" class="category-box" :key="items.id">
+          <h2 class="title-h2">{{ items.seo_category && items.seo_category.name }}</h2>
+          <section>
+            <div class="news-box-2">
+              <news-item-2 v-for="(item, i) in items && items.list" :key="i" :item="item" :index="index">
+              </news-item-2>
+            </div>
+          </section>
         </div>
-      </section> -->
-
-      <section v-swiper:mySwiper="swiperOption" class="swiper-box">
-        <div class="swiper-wrapper">
-          <news-item-1
-            v-for="(item, i) in recNews.list"
-            :key="i"
-            class="swiper-slide"
-            :item="item"
-            :index="i"
-          >
-          </news-item-1>
-        </div>
-      </section>
-
-      <h2 class="title-h2">Trending</h2>
-      <section class="news-box-2">
-        <news-item-2 v-for="(item, i) in trendingNews.list" :key="i" :item="item"> </news-item-2>
-      </section>
-
-      <h2 class="title-h2">All Articles</h2>
-      <section>
-        <InfiniteScrollList
-          api-endpoint="/api/article/menu"
-          :initial-page="2"
-          :page-size="8"
-          mod-id="all"
-          :initial-items="allNews.list"
-          class="news-box-2"
-        >
-          <template #default="{ items }">
-            <news-item-2 v-for="(item, i) in items" :key="i" :item="item"> </news-item-2>
-          </template>
-        </InfiniteScrollList>
-      </section>
+      </div>
+      <div class="layout-right">
+        <right-side-box :rec-news="trendingNews && trendingNews.list || []" :trending-news="recNews && recNews.list || []" />
+      </div>
     </main>
-    <Footer />
+    <FooterSeo />
   </div>
 </template>
 
@@ -65,53 +53,69 @@ export default {
   },
   async asyncData({ $axios, env }) {
     try {
-      // 并行处理多个异步请求
-      const [recNewsResponse, trendingNewsResponse, allNewsResponse] = await Promise.all([
-        $axios.$get("/api/article/menu", {
-          params: {
-            site_id: env.SITE_ID,
-            mod_id: "rec"
-          }
-        }),
-        $axios.$get("/api/article/menu", {
-          params: {
-            site_id: env.SITE_ID,
-            mod_id: "trending",
-            size: 30
-          }
-        }),
-        $axios.$get("/api/article/menu", {
-          params: {
-            site_id: env.SITE_ID,
-            mod_id: "all",
-            page: 1,
-            size: 8
-          }
-        })
-      ]);
-
-      // 返回多个接口的数据
+      const [recNewsResponse, trendingNewsResponse, categoryResponse] =
+        await Promise.all([
+          $axios.$get("/api/article/menu", {
+            params: {
+              site_id: env.SITE_ID,
+              mod_id: "rec"
+            }
+          }),
+          $axios.$get("/api/article/get_all_articles", {
+            params: {
+              site_id: env.SITE_ID,
+              size: 4,
+              page: 1
+            }
+          }),
+          $axios.$get("/api/article/get_all_seo_category", {
+            params: {
+              site_id: env.SITE_ID
+            }
+          }).catch(() => null)
+        ]);
+      let category = [];
+      if (categoryResponse && categoryResponse.list) {
+        categoryResponse.list.map((item) => {
+          category.push(
+            $axios.$get("/api/article/get_seo_category_page", {
+              params: {
+                site_id: env.SITE_ID,
+                seo_category_id: item.id,
+                size: 4,
+                page: 1
+              }
+            })
+          );
+        });
+      }
+      let list = await Promise.all(category);
       return {
         recNews: recNewsResponse,
         trendingNews: trendingNewsResponse,
-        allNews: allNewsResponse
+        categoryList: list && list.filter((item) => item != null)
       };
     } catch (error) {
       console.error("Error fetching data:", error);
+      return {
+        recNews: null,
+        trendingNews: null,
+        categoryList: []
+      };
     }
   },
   data() {
     return {
       swiperOption: {
         slidesPerView: "auto",
-        autoplay: {
-          delay: 3000
+        navigation: {
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev"
         }
       },
       input: ""
     };
   },
-
   methods: {
     search() {
       if (this.input.length < 1) {
@@ -121,15 +125,11 @@ export default {
         });
         return;
       }
-
       simulateAFSSearch(this.input);
     },
     clear() {
       this.input = "";
     }
-    // clickWord(words) {
-    //   simulateAFSSearch(words);
-    // }
   }
 };
 </script>
@@ -138,193 +138,128 @@ export default {
   padding-bottom: 32px;
   border-bottom: 1px solid #ececee;
 }
-
-.home-search {
-  width: 100%;
-  height: 315px;
-  background-image: url("~/assets/images/bg-pc.webp");
-  background-size: cover;
-  margin-bottom: 32px;
-  background-position: center;
+.category-box {
   display: flex;
   flex-direction: column;
-  align-items: center;
-
-  .search-group {
-    position: relative;
-  }
-  .search {
-    margin-top: 110px;
-    width: 560px;
-    height: 48px;
-    background: #ffffff;
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0);
-    border-radius: 4px 4px 4px 4px;
-    padding-left: 16px;
-    padding-right: 126px;
-    &::placeholder {
-      color: rgba($font1, 0.6);
-    }
-  }
-  .icon-search {
-    display: block;
-    position: absolute;
-    right: -1px;
-    top: 110px;
-    width: 64px;
-    height: 48px;
-    cursor: pointer;
-    border-radius: 0 4px 4px 0;
+  gap: 0px;
+}
+.swiper-box {
+  position: relative;
+  overflow: hidden;
+  .swiper-button-prev {
+    top: 209px;
+    width: 50px;
+    height: 50px;
     background-color: $color1;
-    background-image: url("~/assets/images/icon-search.png");
-    background-size: 30px;
-    background-repeat: no-repeat;
-    background-position: center;
-  }
-  .icon-clear {
-    position: absolute;
-    right: 76px;
-    top: 122px;
-    cursor: pointer;
-    background-image: url("~/assets/images/icon-clear.png");
-    width: 24px;
-    height: 24px;
-    background-size: cover;
-  }
-
-  .words-container {
-    margin-top: 24px;
-    width: 560px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    overflow: hidden;
-  }
-
-  .marquee {
-    display: flex;
-    overflow: hidden;
-    user-select: none;
-    gap: 12px;
-  }
-
-  .marquee-group {
-    flex-shrink: 0;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    gap: 12px;
-    min-width: 100%;
-    animation: scrollLeft 40s linear infinite;
+    justify-content: center;
+    &:after {
+      content: "";
+      display: block;
+      width: 12px;
+      height: 12px;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      transform: rotate(-45deg);
+      margin-left: 4px;
+    }
   }
-  .marquee:nth-child(even) {
-    margin-left: calc(vw(176) / -2);
+  .swiper-button-next {
+    top: 209px;
+    width: 50px;
+    height: 50px;
+    background-color: $color1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:after {
+      content: "";
+      display: block;
+      width: 12px;
+      height: 12px;
+      border-top: 2px solid #fff;
+      border-right: 2px solid #fff;
+      transform: rotate(45deg);
+      margin-right: 4px;
+    }
   }
-  .hot-words {
-    background: rgba(23, 23, 23, 0.35);
-    border-radius: 4px 4px 4px 4px;
-    padding: 6px 8px;
-    font-family: "se3";
-    font-size: 12px;
-    color: #ffffff;
-    text-align: left;
-    cursor: pointer;
-  }
-}
-
-.swiper-slide {
-  width: 282px;
-  border-radius: 16px 16px 16px 16px;
-  border: 1px solid rgba(23, 23, 23, 0.1);
-  margin-right: 24px;
-  overflow: hidden;
 }
 .news-box-2 {
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
-
-.rec {
-  display: none;
+.swiper-slide {
+  overflow: hidden;
 }
-
-@keyframes scrollLeft {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(calc(-100% - vw(16)));
-  }
-}
-@media screen and (max-width: 1100px) {
-  .news-box-2 {
-    display: flex;
-    flex-wrap: wrap;
-  }
+.news-box-new {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
 }
 @media screen and (max-width: 750px) {
   .main {
     padding-bottom: vw(32);
     border-bottom: none;
   }
-
-  .home-search {
-    width: 100vw;
-    height: vw(392);
-    background-image: url("~/assets/images/bg-m.webp");
-    margin-bottom: vw(48);
-    margin-left: vw(-46);
-    margin-top: vw(-48);
-    .search {
-      margin-top: vw(66);
-      width: vw(658);
-      height: vw(80);
-      box-shadow: 0 0 vw(16) 0 rgba(0, 0, 0, 0);
-      border-radius: vw(8);
-      padding-left: vw(34);
-      padding-right: vw(210);
-    }
-    .icon-search {
-      top: vw(66);
-      width: vw(128);
-      height: vw(80);
-      border-radius: 0 vw(8) vw(8) 0;
-      background-size: vw(48);
-    }
-    .icon-clear {
-      top: vw(90);
-      right: vw(144);
-      width: vw(32);
-      height: vw(32);
-    }
-    .words-container {
-      margin-top: vw(16);
-      width: 100%;
-    }
-  }
-
-  .rec {
-    margin-top: vw(24);
-    display: inline-block;
-    text-align: center;
-    font-family: "hem";
-    font-size: 12px;
-    color: #ffffff;
-  }
   .swiper-box {
-    width: 100vw;
-    margin-left: vw(-46);
-    padding-left: vw(32);
+    margin-top: vw(32);
+    width: 100%;
+    .swiper-button-prev {
+      top: vw(186);
+      width: vw(64);
+      height: vw(64);
+      background-color: $color1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &:after {
+        content: "";
+        display: block;
+        width: vw(16);
+        height: vw(16);
+        border-top: 2px solid #fff;
+        border-left: 2px solid #fff;
+        transform: rotate(-45deg);
+        margin-left: vw(4);
+      }
+    }
+    .swiper-button-next {
+      top: vw(186);
+      width: vw(64);
+      height: vw(64);
+      background-color: $color1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &:after {
+        content: "";
+        display: block;
+        width: vw(16);
+        height: vw(16);
+        border-top: 2px solid #fff;
+        border-right: 2px solid #fff;
+        transform: rotate(45deg);
+        margin-right: vw(4);
+      }
+    }
   }
   .swiper-slide {
-    width: vw(614);
-    border-radius: vw(16);
-    border: vw(2) solid #ececee;
-    margin-right: vw(32);
+    width: 100%;
+    height: vw(764);
   }
   .news-box-2 {
-    gap: vw(32);
+    gap: vw(28) vw(14);
+  }
+  .news-box-new {
+    grid-template-columns: repeat(1, 1fr);
+    gap: vw(20);
   }
 }
 </style>
