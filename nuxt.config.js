@@ -20,8 +20,14 @@ export default {
       const path = await pathData.json();
       const categoryPaths = path.data.category.map((item) => `/category/${item}/`);
       const detailPaths = path.data.detail.map((item) => `/detail/${item}/`);
-      const urls = [...categoryPaths, ...detailPaths];
-      return urls;
+
+      const pathV2Data = await fetch(
+        `${process.env.PROD_API_URL}/api/article/get_all_path_v2?site_id=${process.env.SITE_ID}`
+      );
+      const pathV2 = await pathV2Data.json();
+      const slugPaths = (pathV2.data.detail || []).map((item) => `/${item}/`);
+
+      return [...categoryPaths, ...detailPaths, ...slugPaths];
     }
   },
   axios: {
@@ -34,47 +40,19 @@ export default {
   head: {
     title: "Koureishalife - world news in the palm of your hand!",
     meta: [
-      {
-        name: "version",
-        content: process.env.APP_VERSION || "1.0"
-      },
-      {
-        name: "viewport",
-        content:
-          "width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"
-      },
-      {
-        name: "apple-mobile-web-app-capable",
-        content: "yes"
-      },
-      {
-        name: "mobile-web-app-capable",
-        content: "yes"
-      },
-      {
-        hid: "description",
-        name: "description",
-        content:
-          "We are committed to delivering the latest developments in various fields such as politics, economy, technology, culture and sports!"
-      },
-      {
-        hid: "keywords",
-        name: "keywords",
-        content: "Frontier news, news IT K news, sports news, fashion news, car news, health news"
-      },
-      {
-        hid: "og:site_name",
-        property: "og:site_name",
-        content: "Koureishalife"
-      }
+      { name: "version", content: process.env.APP_VERSION || "1.0" },
+      { name: "viewport", content: "width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { hid: "description", name: "description", content: "We are committed to delivering the latest developments in various fields such as politics, economy, technology, culture and sports!" },
+      { hid: "keywords", name: "keywords", content: "Frontier news, news IT K news, sports news, fashion news, car news, health news" },
+      { hid: "og:site_name", property: "og:site_name", content: "Koureishalife" }
     ],
     link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
   },
   image: {
     provider: "cloudflare",
-    cloudflare: {
-      baseURL: "https://bunchthings.com"
-    }
+    cloudflare: { baseURL: "https://bunchthings.com" }
   },
   plugins: [
     { src: "~/plugins/vue-infinite-scroll", ssr: false },
@@ -85,36 +63,23 @@ export default {
   components: true,
   buildModules: ["@nuxtjs/style-resources", "@nuxt/image", "@nuxtjs/pwa", "@nuxtjs/sitemap"],
   css: ["@/assets/css/fonts.css", "@/assets/css/reset.css", "@/assets/css/common.scss"],
-  styleResources: {
-    scss: ["~/assets/css/_mixins.scss"]
-  },
+  styleResources: { scss: ["~/assets/css/_mixins.scss"] },
   modules: ["@nuxtjs/axios"],
-  sitemap: {
-    hostname: "https://koureishalife.com/"
-  },
+  sitemap: { hostname: "https://koureishalife.com/" },
   pwa: {
     manifest: {
       name: "Koureishalife",
       short_name: "Koureishalife",
-      description:
-        "We are committed to delivering you the latest developments in various fields, including politics, economy, technology, culture, sports, and more.!"
+      description: "We are committed to delivering you the latest developments in various fields, including politics, economy, technology, culture, sports, and more.!"
     },
     icon: {
-      source: "/static/icon.png", // 应用图标路径
-      fileName: "icon.png", // 生成的图标名称
-      sizes: [32, 64, 120, 144, 152, 192, 512] // 自定义生成的图标尺寸
+      src: "static/icon.png",
+      sizes: [32, 64, 120, 144, 152, 192, 512]
     }
   },
   build: {
-    html: {
-      minify: {
-        collapseWhitespace: true,
-        removeComments: true
-      }
-    },
-    extractCSS: {
-      ignoreOrder: true
-    },
+    html: { minify: { collapseWhitespace: true, removeComments: true } },
+    extractCSS: { ignoreOrder: true },
     optimization: {
       splitChunks: {
         chunks: "all",
@@ -123,43 +88,15 @@ export default {
         minSize: 10000,
         maxSize: 244000,
         cacheGroups: {
-          vendor: {
-            name: "vendors",
-            test: /[\\/]node_modules[\\/]/,
-            chunks: "all",
-            maxSize: 244000,
-            priority: -10
-          },
-          styles: {
-            name: "styles",
-            test: /\.(css|vue)$/,
-            chunks: "all",
-            enforce: true
-          }
+          vendor: { name: "vendors", test: /[\\/]node_modules[\\/]/, chunks: "all", maxSize: 244000, priority: -10 },
+          styles: { name: "styles", test: /\.(css|vue)$/, chunks: "all", enforce: true }
         }
       },
       minimize: true,
       minimizer: [
-        new TerserPlugin({
-          terserOptions: {
-            compress: {
-              drop_console: true
-            },
-            output: {
-              comments: false
-            }
-          }
-        }),
-        new OptimizeCSSAssetsPlugin({
-          cssProcessorOptions: {
-            map: { inline: false },
-            discardComments: { removeAll: true }
-          }
-        })
+        new TerserPlugin({ terserOptions: { compress: { drop_console: true }, output: { comments: false } } }),
+        new OptimizeCSSAssetsPlugin({ cssProcessorOptions: { map: { inline: false }, discardComments: { removeAll: true } } })
       ]
     }
-  },
-  purgeCSS: {
-    whitelistPatterns: [/^swiper-container/, /^swiper-wrapper/] // 忽略swiper样式
   }
 };
