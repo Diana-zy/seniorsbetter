@@ -13,9 +13,7 @@
       <div class="category">
         <ul class="dropdown">
           <li v-for="(item, i) in navData && navData.list && navData.list.slice(0, 6)" :key="i"
-            ><CustomLink :to="`/category/${item.path}/`">}{{
-              capitalizeFirstLetter(item.name)
-            }}</CustomLink></li
+            ><CustomLink :to="`/category/${item.path}/`">{{ capitalizeFirstLetter(item.name) }}</CustomLink></li
           >
         </ul>
       </div>
@@ -32,9 +30,7 @@
               <div class="menu-nav-list" v-show="isSidebarOpen">
                 <ul>
                   <li v-for="item in navData && navData.list" :key="item.path">
-                    <CustomLink :to="`/category/${item.path}/`">}{{
-                      capitalizeFirstLetter(item.name)
-                    }}</CustomLink>
+                    <CustomLink :to="`/category/${item.path}/`">{{ capitalizeFirstLetter(item.name) }}</CustomLink>
                   </li>
                 </ul>
               </div>
@@ -64,14 +60,8 @@ import { simulateAFSSearch, capitalizeFirstLetter } from "~/utils/utils";
 
 export default {
   props: {
-    categories: {
-      type: Array,
-      default: () => []
-    },
-    pageTitle: {
-      type: String,
-      default: ""
-    }
+    categories: { type: Array, default: () => [] },
+    pageTitle: { type: String, default: "" }
   },
   data() {
     return {
@@ -103,11 +93,8 @@ export default {
     handleOpenSearch() {
       this.isSidebarOpen = false;
       this.showSearch = !this.showSearch;
-      if (this.showSearch) {
-        document.body.classList.add("no-scroll");
-      } else {
-        document.body.classList.remove("no-scroll");
-      }
+      if (this.showSearch) document.body.classList.add("no-scroll");
+      else document.body.classList.remove("no-scroll");
     },
     handleClickMask() {
       this.showSearch = false;
@@ -116,10 +103,7 @@ export default {
     },
     search() {
       if (this.input.length < 1) {
-        this.$globalMethod.showNotification({
-          message: "Please enter at least 1 characters",
-          type: "warning"
-        });
+        this.$globalMethod.showNotification({ message: "Please enter at least 1 characters", type: "warning" });
         return;
       }
       simulateAFSSearch(this.input);
@@ -127,27 +111,18 @@ export default {
     installPWA() {
       if (this.deferredPrompt) {
         this.deferredPrompt.prompt();
-        this.deferredPrompt.userChoice.then(() => {
-          this.deferredPrompt = null;
-        });
+        this.deferredPrompt.userChoice.then(() => { this.deferredPrompt = null; });
       }
     },
     toggleSidebar() {
       this.showSearch = false;
       this.isSidebarOpen = !this.isSidebarOpen;
-      if (this.isSidebarOpen) {
-        document.body.classList.add("no-scroll");
-      } else {
-        document.body.classList.remove("no-scroll");
-      }
+      if (this.isSidebarOpen) document.body.classList.add("no-scroll");
+      else document.body.classList.remove("no-scroll");
     },
-    closeSidebar() {
-      this.isSidebarOpen = false;
-    },
+    closeSidebar() { this.isSidebarOpen = false; },
     handleClick() {},
-    clear() {
-      this.input = "";
-    }
+    clear() { this.input = ""; }
   }
 };
 </script>
@@ -204,11 +179,7 @@ export default {
     li {
       white-space: nowrap;
       flex: 1;
-      a {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
+      a { display: block; width: 100%; height: 100%; }
     }
   }
 }
@@ -218,7 +189,6 @@ export default {
   right: 0;
   width: 380px;
   height: 48px;
-  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0);
   border-radius: 8px;
   border: 1px solid $font3;
   margin: 0 0 0 24px;
@@ -232,10 +202,7 @@ export default {
   width: 60%;
   height: 100%;
   font-family: "rs";
-  &::placeholder {
-    font-family: "rs";
-    color: rgba($font1, 0.4);
-  }
+  &::placeholder { font-family: "rs"; color: rgba($font1, 0.4); }
 }
 .icon-clear {
   position: absolute;
@@ -258,14 +225,9 @@ export default {
   @include icon(32px, 32px, "icon-search4.png");
   background-size: 32px 32px;
 }
-
-.dropdown li:hover {
-  color: $color1;
-}
+.dropdown li:hover { color: $color1; }
 @media screen and (max-width: 1100px) {
-  .search-box {
-    width: 240px;
-  }
+  .search-box { width: 240px; }
 }
 @media screen and (max-width: 750px) {
   .header {
@@ -284,22 +246,8 @@ export default {
       align-items: flex-start;
       justify-content: center;
       gap: vw(4);
-      .logo {
-        width: vw(320);
-        height: vw(48);
-        @include bg("logo.png");
-        margin-right: 0;
-      }
-      .site-h1 {
-        font-size: 14px !important;
-        font-weight: 700;
-        color: $font1;
-        max-width: vw(460);
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        line-height: 1;
-      }
+      .logo { width: vw(320); height: vw(48); @include bg("logo.png"); margin-right: 0; }
+      .site-h1 { font-size: 14px !important; font-weight: 700; color: $font1; max-width: vw(460); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1; }
     }
   }
   .menu-nav-list {
@@ -315,47 +263,20 @@ export default {
     z-index: 12;
     font-family: "rs";
     font-size: vw(32);
-    li {
-      padding: vw(16) 0;
-      line-height: vw(48);
-      border-bottom: vw(2) solid rgba($font3, 0.2);
-    }
-    a {
-      display: inline-block;
-      width: 100%;
-    }
+    li { padding: vw(16) 0; line-height: vw(48); border-bottom: vw(2) solid rgba($font3, 0.2); }
+    a { display: inline-block; width: 100%; }
   }
-  .contact,
-  .category {
-    display: none;
-  }
-  .icon-sidebar {
-    @include icon(vw(48), vw(48), "icon-sidebar.png");
-    cursor: pointer;
-  }
-  .pc-hidden {
-    margin-left: auto;
-  }
-  .menu {
-    height: 100%;
-    width: auto;
-  }
-  .search-m-box {
-    width: auto;
-    height: vw(64);
-    display: flex;
-    align-items: center;
-    gap: vw(20);
-  }
+  .contact, .category { display: none; }
+  .icon-sidebar { @include icon(vw(48), vw(48), "icon-sidebar.png"); cursor: pointer; }
+  .pc-hidden { margin-left: auto; }
+  .menu { height: 100%; width: auto; }
+  .search-m-box { width: auto; height: vw(64); display: flex; align-items: center; gap: vw(20); }
   .search {
     position: relative;
     width: 100%;
     height: 100%;
     font-family: "rs";
-    &::placeholder {
-      font-family: "rs";
-      color: rgba($font1, 0.4);
-    }
+    &::placeholder { font-family: "rs"; color: rgba($font1, 0.4); }
   }
   .icon-clear {
     position: absolute;
@@ -384,12 +305,7 @@ export default {
     height: vw(80);
     display: flex;
     flex-wrap: nowrap;
-    .search-nav {
-      width: 100%;
-      border: vw(2) solid $font3;
-      border-radius: vw(12);
-      padding-left: vw(32);
-    }
+    .search-nav { width: 100%; border: vw(2) solid $font3; border-radius: vw(12); padding-left: vw(32); }
     .icon-clear-nav {
       position: absolute;
       right: vw(100);
@@ -410,9 +326,7 @@ export default {
       @include btn-img(vw(48), vw(48), "icon-search4.png");
     }
   }
-  .show-close {
-    @include icon(vw(48), vw(48), "icon-close.png");
-  }
+  .show-close { @include icon(vw(48), vw(48), "icon-close.png"); }
   .mask {
     position: absolute;
     top: vw(114);

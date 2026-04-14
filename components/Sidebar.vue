@@ -3,28 +3,17 @@
     <div v-if="isOpen" class="overlay" @click="closeSidebar"></div>
     <div class="sidebar" :class="{ 'sidebar-hidden': !isOpen }">
       <div class="close" @click="closeSidebar"></div>
-
       <div class="search-box">
-        <input
-          v-model="input"
-          :placeholder="searchText[lang] || searchText['en']"
-          class="search"
-          name="search"
-          @keyup.enter="search"
-        />
+        <input v-model="input" :placeholder="searchText[lang] || searchText['en']" class="search" name="search" @keyup.enter="search" />
         <i v-show="input != ''" class="icon-clear" @click="clear"></i>
         <i class="icon-search" @click="search"></i>
       </div>
-
       <h2 class="title-h2">{{ categoryText[lang] || categoryText['en'] }}</h2>
       <ul class="categories">
         <li v-for="(item, i) in navData.list" :key="i">
-          <CustomLink :to="`/category/${item.path}/`">}{{
-            capitalizeFirstLetter(item.name)
-          }}</CustomLink>
+          <CustomLink :to="`/category/${item.path}/`">{{ capitalizeFirstLetter(item.name) }}</CustomLink>
         </li>
       </ul>
-
       <div v-if="showInstallButton" class="btn-download" @click="installPWA">
         <i class="icon-pwa"></i>
         <span>{{ downloadText[lang] || downloadText['en'] }}</span>
@@ -38,65 +27,33 @@ import { simulateAFSSearch, capitalizeFirstLetter } from "~/utils/utils";
 
 export default {
   props: {
-    isOpen: {
-      type: Boolean,
-      required: true
-    },
-    navData: {
-      type: Object,
-      default: () => ({})
-    },
-    lang: {
-      type: String,
-      default: "en"
-    }
+    isOpen: { type: Boolean, required: true },
+    navData: { type: Object, default: () => ({}) },
+    lang: { type: String, default: "en" }
   },
   data() {
     return {
       input: "",
       deferredPrompt: null,
       showInstallButton: false,
-      recKeywords: this.$recKeywords,
-      searchText: {
-        en: "Search...",
-        ja: "検索けんさく..."
-      },
-      categoryText: {
-        en: "Categories",
-        ja: "カテゴリ"
-      },
-      downloadText: {
-        en: "Download",
-        ja: "ダウンロード"
-      }
+      searchText: { en: "Search...", ja: "検索けんさく..." },
+      categoryText: { en: "Categories", ja: "カテゴリ" },
+      downloadText: { en: "Download", ja: "ダウンロード" }
     };
   },
-
-  mounted() {
-    this.checkCanInstallPwa();
-  },
+  mounted() { this.checkCanInstallPwa(); },
   methods: {
     capitalizeFirstLetter,
     search() {
       if (this.input.length < 1) {
-        this.$globalMethod.showNotification({
-          message: "Please enter at least 1 characters",
-          type: "warning"
-        });
+        this.$globalMethod.showNotification({ message: "Please enter at least 1 characters", type: "warning" });
         return;
       }
       simulateAFSSearch(this.input);
     },
-    closeSidebar() {
-      this.$emit("close");
-    },
-    clear() {
-      this.input = "";
-    },
-    handleSearchRecKeyword(keyword) {
-      this.input = keyword;
-      simulateAFSSearch(keyword);
-    },
+    closeSidebar() { this.$emit("close"); },
+    clear() { this.input = ""; },
+    handleSearchRecKeyword(keyword) { this.input = keyword; simulateAFSSearch(keyword); },
     checkCanInstallPwa() {
       if ("serviceWorker" in navigator && "PushManager" in window) {
         if (window.deferredPrompt) {
@@ -114,9 +71,7 @@ export default {
     installPWA() {
       if (this.deferredPrompt) {
         this.deferredPrompt.prompt();
-        this.deferredPrompt.userChoice.then(() => {
-          this.deferredPrompt = null;
-        });
+        this.deferredPrompt.userChoice.then(() => { this.deferredPrompt = null; });
       }
     }
   }
@@ -124,15 +79,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 40;
-}
+.overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 40; }
 .sidebar {
   position: fixed;
   top: 0;
@@ -142,28 +89,11 @@ export default {
   background: #fff;
   transition: transform 0.3s ease;
   z-index: 50;
-  &::before {
-    content: "";
-    display: block;
-    width: 100%;
-    height: vw(2);
-    background: #ececee;
-    position: absolute;
-    top: vw(96);
-  }
+  &::before { content: ""; display: block; width: 100%; height: vw(2); background: #ececee; position: absolute; top: vw(96); }
 }
-.sidebar-hidden {
-  transform: translateX(-100%);
-}
-.close {
-  position: absolute;
-  top: vw(24);
-  left: vw(46);
-  @include icon(vw(48), vw(48), "icon-close.png");
-}
-.title-h2 {
-  margin-left: vw(46);
-}
+.sidebar-hidden { transform: translateX(-100%); }
+.close { position: absolute; top: vw(24); left: vw(46); @include icon(vw(48), vw(48), "icon-close.png"); }
+.title-h2 { margin-left: vw(46); }
 .categories {
   li a {
     font-family: "rs";
@@ -173,11 +103,7 @@ export default {
     align-items: center;
     padding-left: vw(46);
     cursor: pointer;
-    &:hover {
-      font-family: "rssb";
-      background: rgba($color1, 0.2);
-      color: $color1;
-    }
+    &:hover { font-family: "rssb"; background: rgba($color1, 0.2); color: $color1; }
   }
 }
 .btn-download {
@@ -189,38 +115,21 @@ export default {
   padding-left: vw(46);
   display: flex;
   align-items: center;
-  i {
-    @include icon(vw(40), vw(40), "icon-pwa-m.png");
-    margin-right: vw(12);
-  }
-  span {
-    font-family: "rssb";
-    font-size: vw(32);
-    color: $color1;
-  }
+  i { @include icon(vw(40), vw(40), "icon-pwa-m.png"); margin-right: vw(12); }
+  span { font-family: "rssb"; font-size: vw(32); color: $color1; }
 }
 .search-box {
   visibility: visible;
   position: relative;
   max-width: vw(578);
   height: vw(80);
-  box-shadow: 0 0 vw(16) 0 rgba(0, 0, 0, 0);
   border-radius: vw(40);
   border: vw(2) solid $color1;
   margin: vw(144) auto vw(24);
   padding-left: vw(20);
   padding-right: vw(192);
 }
-.search {
-  width: 100%;
-  height: 100%;
-  font-size: vw(24);
-  font-family: "rs";
-  &::placeholder {
-    font-family: "rs";
-    color: rgba($font1, 0.4);
-  }
-}
+.search { width: 100%; height: 100%; font-size: vw(24); font-family: "rs"; &::placeholder { font-family: "rs"; color: rgba($font1, 0.4); } }
 .icon-search {
   position: absolute;
   right: vw(-2);
