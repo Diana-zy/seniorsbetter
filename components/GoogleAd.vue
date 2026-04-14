@@ -29,7 +29,7 @@ export default {
         const ins = document.createElement("ins");
         ins.className = "adsbygoogle";
         ins.style.display = "block";
-        ins.setAttribute("data-ad-client", "ca-pub-1853000876464912");
+        ins.setAttribute("data-ad-client", "ca-pub-6612490456597819");
         ins.setAttribute("data-ad-slot", this.adSlot);
         ins.setAttribute("data-ad-format", "rectangle");
         ins.setAttribute("data-full-width-responsive", "true");
@@ -46,14 +46,14 @@ export default {
 .title {
   background: rgba($color1, 0.6);
   line-height: 24px;
+  color: #fff;
   text-align: center;
-  font-size: 12px;
-  color: #ffffff;
+  margin: 0;
 }
 @media screen and (max-width: 879px) {
   .title {
     font-size: vw(24);
-    line-height: vw(30);
+    line-height: vw(35);
   }
 }
 </style>

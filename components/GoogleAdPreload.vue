@@ -4,14 +4,14 @@
     <ins
       class="adsbygoogle"
       style="display: block"
-      data-ad-client="ca-pub-1853000876464912"
+      data-ad-client="ca-pub-6612490456597819"
       data-ad-format="rectangle"
       data-full-width-responsive="true"
       :data-ad-slot="adSlot"
     ></ins>
     <script>
       (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
+    <\/script>
   </div>
 </template>
 
@@ -35,7 +35,6 @@ export default {
   background: rgba($color1, 0.6);
   line-height: 24px;
   color: #fff;
-  font-size: 12px;
   text-align: center;
   margin: 0;
 }
