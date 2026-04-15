@@ -38,15 +38,15 @@ export default {
     trailingSlash: true
   },
   head: {
-    title: "Koureishalife - world news in the palm of your hand!",
+    title: "Seniors Better | Essential Resources and Tips for Elders' Well-being",
     meta: [
       { name: "version", content: process.env.APP_VERSION || "1.0" },
       { name: "viewport", content: "width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "mobile-web-app-capable", content: "yes" },
-      { hid: "description", name: "description", content: "We are committed to delivering the latest developments in various fields such as politics, economy, technology, culture and sports!" },
-      { hid: "keywords", name: "keywords", content: "Frontier news, news IT K news, sports news, fashion news, car news, health news" },
-      { hid: "og:site_name", property: "og:site_name", content: "Koureishalife" }
+      { hid: "description", name: "description", content: "Discover essential resources, expert advice, and practical tips for seniors to enhance their well-being. Start exploring today and live a fulfilling, independent life." },
+      { hid: "keywords", name: "keywords", content: "senior resources, elder care, senior discounts, retirement tips, senior well-being, aging advice" },
+      { hid: "og:site_name", property: "og:site_name", content: "Seniors Better" }
     ],
     link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
   },
@@ -65,12 +65,12 @@ export default {
   css: ["@/assets/css/fonts.css", "@/assets/css/reset.css", "@/assets/css/common.scss"],
   styleResources: { scss: ["~/assets/css/_mixins.scss"] },
   modules: ["@nuxtjs/axios"],
-  sitemap: { hostname: "https://koureishalife.com/" },
+  sitemap: { hostname: "https://seniorsbetter.com/" },
   pwa: {
     manifest: {
-      name: "Koureishalife",
-      short_name: "Koureishalife",
-      description: "We are committed to delivering you the latest developments in various fields, including politics, economy, technology, culture, sports, and more.!"
+      name: "Seniors Better",
+      short_name: "Seniors Better",
+      description: "Welcome to Seniors Better, your dedicated digital resource designed to help elders navigate the aging journey with confidence and independence."
     },
     icon: {
       src: "static/icon.png",
