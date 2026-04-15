@@ -98,7 +98,7 @@ export default {
       const { toc: flatToc, htmlWithAnchor } = processHtmlWithToc(data.content, [2]);
       const toc = generateNestedToc(flatToc);
       const articleFaqs = data.faqs || [
-        { question: "Want to learn more about this topic?", answer: "Koureishalife covers the latest news and information across politics, economy, technology, culture, sports, and more." },
+        { question: "Want to learn more about this topic?", answer: "Seniors Better covers essential resources, expert advice, and practical tips for seniors to enhance their well-being." },
         { question: "Where can I find more related articles?", answer: "Browse our category pages to find more articles on topics that interest you." }
       ];
       return {
@@ -118,18 +118,18 @@ export default {
   head() {
     return {
       htmlAttrs: { lang: this.newInfo && this.newInfo.language },
-      title: this.newInfo && this.newInfo.name ? this.newInfo.name + " - Koureishalife" : "Koureishalife",
+      title: this.newInfo && this.newInfo.name ? this.newInfo.name + " - Seniors Better" : "Seniors Better",
       meta: [
         { hid: "description", name: "description", content: this.newInfo && this.newInfo.seo_desc },
         { hid: "keywords", name: "keywords", content: this.newInfo && this.newInfo.terms },
         { hid: "og:title", property: "og:title", content: this.newInfo && this.newInfo.seo_title },
         { hid: "og:description", property: "og:description", content: this.newInfo && this.newInfo.seo_desc },
-        { hid: "og:url", property: "og:url", content: "https://www.koureishalife.com/" + (this.newInfo && this.newInfo.path_v2) + "/" },
+        { hid: "og:url", property: "og:url", content: "https://www.seniorsbetter.com/" + (this.newInfo && this.newInfo.path_v2) + "/" },
         { hid: "og:locale", property: "og:locale", content: this.newInfo && this.newInfo.language },
         { hid: "og:image", property: "og:image", content: "https://bunchthings.com/cdn-cgi/image/w=600,f=auto,fit=cover/" + (this.newInfo && this.newInfo.cover) },
         { hid: "og:type", property: "og:type", content: "article" }
       ],
-      link: [{ rel: "canonical", href: "https://www.koureishalife.com/" + (this.newInfo && this.newInfo.path_v2) + "/" }],
+      link: [{ rel: "canonical", href: "https://www.seniorsbetter.com/" + (this.newInfo && this.newInfo.path_v2) + "/" }],
       script: [
         {
           type: "application/ld+json",
@@ -142,8 +142,8 @@ export default {
             datePublished: this.newInfo && this.newInfo.updated_at,
             dateModified: this.newInfo && this.newInfo.updated_at,
             author: [{ "@type": "Person", name: this.newInfo && this.newInfo.author && this.newInfo.author.name }],
-            publisher: { "@type": "Organization", name: "Koureishalife", logo: { "@type": "ImageObject", url: "https://www.koureishalife.com/logo.png" } },
-            mainEntityOfPage: { "@type": "WebPage", "@id": "https://www.koureishalife.com/" + (this.newInfo && this.newInfo.path_v2) + "/" }
+            publisher: { "@type": "Organization", name: "Seniors Better", logo: { "@type": "ImageObject", url: "https://www.seniorsbetter.com/logo.png" } },
+            mainEntityOfPage: { "@type": "WebPage", "@id": "https://www.seniorsbetter.com/" + (this.newInfo && this.newInfo.path_v2) + "/" }
           }
         }
       ]
