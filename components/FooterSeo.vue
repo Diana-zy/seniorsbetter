@@ -2,11 +2,12 @@
   <footer class="footer" :class="{ sm: ['de'].indexOf(lang) !== -1 }">
     <div class="footer-info">
       <div class="icon-logo">
-        <img :src="icon" alt="Koureishalife" />
+        <img :src="icon" alt="Seniors Better" />
       </div>
       <div class="website-info">
-        <div>Koureishalife is your trusted source for the latest global news and information across politics, economy, technology, culture, sports, and more.</div>
-        <div>We are committed to delivering comprehensive, accurate, and timely coverage of world events to keep you informed and engaged.</div>
+        <div>Welcome to Seniors Better, your dedicated digital resource designed to help elders navigate the aging journey with confidence and independence.</div>
+        <div>We provide expert-led guides and practical advice across five essential pillars: maximizing senior discounts, simplifying complex insurance options, finding compassionate elder care, securing your financial future, and embracing a vibrant retirement lifestyle.</div>
+        <div>Our mission is to empower you with the knowledge needed to live your golden years to the fullest, ensuring a more secure and fulfilling life every day.</div>
       </div>
       <div class="link-info">
         <ul>
@@ -17,11 +18,11 @@
             <CustomLink :to="'/eula.html'" target="_blank">Terms of Service</CustomLink>
           </li>
           <li class="link-item">
-            <a href="mailto:service@koureishalife.com">Contact</a>
+            <a href="mailto:service@seniorsbetter.com">Contact</a>
           </li>
         </ul>
       </div>
-      <div class="bottom-info">Copyright &copy; 2024 Koureishalife &nbsp; All rights reserved</div>
+      <div class="bottom-info">Copyright &copy; 2024 Seniors Better &nbsp; All rights reserved</div>
     </div>
     <Notification v-if="showNotification" :message="notificationMessage" />
   </footer>
