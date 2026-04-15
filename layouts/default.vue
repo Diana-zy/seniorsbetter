@@ -20,9 +20,9 @@ export default {
           json: {
             "@context": "https://schema.org",
             "@type": "Organization",
-            name: "Koureishalife",
-            url: "https://www.koureishalife.com/",
-            logo: "https://bunchthings.com/site-logo/koureishalife/koureishalife-logo-144.png",
+            name: "Seniors Better",
+            url: "https://www.seniorsbetter.com/",
+            logo: "https://www.seniorsbetter.com/logo.png",
             sameAs: this.$sameAs || [],
             ContactPoint: [],
             parentOrganization: {}
@@ -33,11 +33,11 @@ export default {
           json: {
             "@context": "https://schema.org",
             "@type": "WebSite",
-            name: "Koureishalife",
-            url: "https://www.koureishalife.com/",
+            name: "Seniors Better",
+            url: "https://www.seniorsbetter.com/",
             potentialAction: {
               "@type": "SearchAction",
-              target: "https://www.koureishalife.com/search/?query={search_term_string}",
+              target: "https://www.seniorsbetter.com/search/?query={search_term_string}",
               "query-input": "required name=search_term_string"
             }
           }
@@ -47,7 +47,7 @@ export default {
         {
           rel: "canonical",
           hid: "canonical",
-          href: `https://www.koureishalife.com${this.$nuxt.context.route.path}`
+          href: `https://www.seniorsbetter.com${this.$nuxt.context.route.path}`
         }
       ]
     };
