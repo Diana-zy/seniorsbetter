@@ -94,14 +94,17 @@ export default {
     }
   },
   head() {
-    const categoryName = (this.categoryInfo && this.categoryInfo.seo_category && this.categoryInfo.seo_category.name) || "";
+    const category = this.categoryInfo && this.categoryInfo.seo_category;
+    const categoryName = (category && category.name) || "";
+    const seoTitle = (category && category.seo_title) || `${categoryName} - Seniors Better`;
+    const seoDesc = (category && category.seo_desc) || `Browse the latest ${categoryName} articles on Seniors Better.`;
     return {
-      title: `${categoryName} - Seniors Better`,
+      title: seoTitle,
       meta: [
         {
           hid: "description",
           name: "description",
-          content: `Browse the latest ${categoryName} articles on Seniors Better.`
+          content: seoDesc
         }
       ],
       script: [
