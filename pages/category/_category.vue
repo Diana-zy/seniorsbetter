@@ -96,12 +96,12 @@ export default {
   head() {
     const categoryName = (this.categoryInfo && this.categoryInfo.seo_category && this.categoryInfo.seo_category.name) || "";
     return {
-      title: `${categoryName} - Koureishalife`,
+      title: `${categoryName} - Seniors Better`,
       meta: [
         {
           hid: "description",
           name: "description",
-          content: `Browse the latest ${categoryName} articles on Koureishalife.`
+          content: `Browse the latest ${categoryName} articles on Seniors Better.`
         }
       ],
       script: [
@@ -115,7 +115,7 @@ export default {
                 "@type": "ListItem",
                 position: 1,
                 item: {
-                  "@id": "https://www.koureishalife.com/",
+                  "@id": "https://www.seniorsbetter.com/",
                   name: "Home"
                 }
               },
@@ -123,7 +123,7 @@ export default {
                 "@type": "ListItem",
                 position: 2,
                 item: {
-                  "@id": `https://www.koureishalife.com/category/${this.id}/`,
+                  "@id": `https://www.seniorsbetter.com/category/${this.id}/`,
                   name: categoryName
                 }
               }
