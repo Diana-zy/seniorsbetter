@@ -1,6 +1,6 @@
 <template>
   <div class="page home-page">
-    <Header page-title="Global News &amp; Information" />
+    <Header page-title="Seniors Better Empowering Your Senior Journey" />
     <main class="main">
       <div class="layout-left">
         <section v-swiper:mySwiper="swiperOption" class="swiper-box">
@@ -114,6 +114,18 @@ export default {
         }
       },
       input: ""
+    };
+  },
+  head() {
+    return {
+      title: "Seniors Better | Essential Resources and Tips for Elders' Well-being",
+      meta: [
+        {
+          hid: "description",
+          name: "description",
+          content: "Discover essential resources, expert advice, and practical tips for seniors to enhance their well-being. Start exploring today and live a fulfilling, independent life."
+        }
+      ]
     };
   },
   methods: {
