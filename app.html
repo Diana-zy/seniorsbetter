@@ -65,6 +65,55 @@
           return await originalFetch(resource, config);
         };
       })();
+      // seo organic traffic timing and page view events
+      (function (uuid) {
+        let new_time = new Date().getTime();
+        const hi_user_source = getValueByURLOrCookie("hi_source");
+        if (hi_user_source === "unknown") {
+          if (window.location.pathname === "/") {
+            window.dataLayer.push({ event: "Home_Page_View_SEO" });
+          }
+          if (window.location.pathname.startsWith("/category/")) {
+            let path = window.location.pathname.split("/")[2];
+            const lastDashIndex = path.lastIndexOf("-");
+            const id = path.substring(lastDashIndex + 1, path.length);
+            window.dataLayer.push({ event: "Category_Page_View_SEO", SEO_category: "category_" + id });
+          }
+          if (window.location.pathname.startsWith("/detail/")) {
+            let path = window.location.pathname.split("/")[2];
+            const lastDashIndex = path.lastIndexOf("-");
+            const id = path.substring(lastDashIndex + 1, path.length);
+            window.dataLayer.push({ event: "Detail_Page_View_SEO", SEO_detail: "detail_" + id });
+          }
+          try {
+            let seo_user_id = JSON.parse(window.getCookie("seo_user_id-" + uuid)) || {};
+            if (!seo_user_id.first_time) { seo_user_id.first_time = new_time; }
+            if (!seo_user_id.Page_View_SEO) {
+              window.dataLayer.push({ event: "Page_View_SEO" });
+              seo_user_id.Page_View_SEO = "yes";
+            }
+            window.setCookie("seo_user_id-" + uuid, JSON.stringify(seo_user_id));
+            if (!seo_user_id.User_Stay_10s_SEO || !seo_user_id.User_Stay_20s_SEO) {
+              new_time = new Date().getTime();
+              const timer = setInterval(() => {
+                new_time += 1;
+                if (new_time - Number(seo_user_id.first_time) >= 10000 && !seo_user_id.User_Stay_10s_SEO) {
+                  window.dataLayer.push({ event: "User_Stay_10s_SEO" });
+                  seo_user_id.User_Stay_10s_SEO = "yes";
+                  window.setCookie("seo_user_id-" + uuid, JSON.stringify(seo_user_id));
+                }
+                if (new_time - Number(seo_user_id.first_time) >= 20000 && !seo_user_id.User_Stay_20s_SEO) {
+                  window.dataLayer.push({ event: "User_Stay_20s_SEO" });
+                  seo_user_id.User_Stay_20s_SEO = "yes";
+                  window.setCookie("seo_user_id-" + uuid, JSON.stringify(seo_user_id));
+                  clearInterval(timer);
+                }
+                if (new_time - Number(seo_user_id.first_time) >= 30000) { clearInterval(timer); }
+              }, 1);
+            }
+          } catch (e) {}
+        }
+      })(uuid);
     </script>
     <script>
       (function () {
@@ -156,10 +205,29 @@
               const ttclid = searchParams.get("ttclid");
               pushEventToGTM("T_AR", { hi_country: window.youknowwho_ip_country || "unknown", hi_ip: window.youknowwho_ip || "unknown", hi_ttclid: ttclid || window.getCookie("hi_ttclid") || "unknown" });
               handleDataMonitor();
+              const hi_user_source_tar = getValueByURLOrCookie("hi_source");
+              if (hi_user_source_tar === "unknown") {
+                if (window.location.pathname.startsWith("/detail/")) {
+                  let detailPath = window.location.pathname.split("/")[2];
+                  const lastDashIdx = detailPath.lastIndexOf("-");
+                  const detailId = detailPath.substring(lastDashIdx + 1, detailPath.length);
+                  window.dataLayer.push({ event: "Detail_T_AR_SEO", SEO_detail: "detail_" + detailId });
+                }
+              }
             } else {
               window.pushEventParamsToGtm("T_AC");
               TACChangeCookie();
               if (window.location.pathname.startsWith("/detail")) window.setCookie("click_ad", 1);
+              const hi_user_source_tac = getValueByURLOrCookie("hi_source");
+              if (hi_user_source_tac === "unknown") {
+                if (window.location.pathname.startsWith("/detail/")) {
+                  let detailPath = window.location.pathname.split("/")[2];
+                  const lastDashIdx = detailPath.lastIndexOf("-");
+                  const detailId = detailPath.substring(lastDashIdx + 1, detailPath.length);
+                  window.dataLayer.push({ event: "Detail_D_T_AC_SEO", SEO_detail: "detail_" + detailId });
+                  window.setCookie("SEO_detail", "detail_" + detailId);
+                }
+              }
             }
           } else if (src.includes("afs/ads/i/")) {
             eventName = "T_AG";

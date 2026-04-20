@@ -40,9 +40,9 @@ function pushEventToGTM(event, param = {}) {
   const hi_channel = getValueByURLOrCookie("channel");
   const hi_gaid = getCookie("_ga") || "unknown";
   const hi_source = getValueByURLOrCookie("hi_source");
-  const { hi_source_clid, hi_source_aid, hi_source_site } = getInfoBySource(hi_source);
+  const { hi_source_clid, hi_source_aid, hi_source_site, hi_source_site_name, hi_section_id, hi_section_name } = getInfoBySource(hi_source);
   window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event, hi_channel, hi_gaid, hi_source, hi_source_clid, hi_source_aid, hi_source_site, ...param });
+  window.dataLayer.push({ event, hi_channel, hi_gaid, hi_source, hi_source_clid, hi_source_aid, hi_source_site, hi_source_site_name, hi_section_id, hi_section_name, ...param });
 }
 function TACChangeCookie() {
   const detailPvUser = window.getCookie("detailPvUser");
