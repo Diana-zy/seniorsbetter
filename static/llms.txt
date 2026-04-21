@@ -2,12 +2,12 @@
 
 ## Site Overview
 
-Seniors Better is a professional information website dedicated to helping seniors navigate the aging journey with confidence and independence, focusing on:
+Seniors Better is a comprehensive information website dedicated to helping seniors navigate the aging journey with confidence and independence, focusing on:
 
 - Essential health and wellness resources for older adults
 - Financial planning and retirement guidance
 - Independent living tips and practical advice
-- Caregiver support and resources
+- Caregiver support and family resources
 
 ## Site Structure
 
