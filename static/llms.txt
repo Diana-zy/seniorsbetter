@@ -1,0 +1,66 @@
+# Seniors Better - LLM Guide
+
+## Site Overview
+
+Seniors Better is a professional information website dedicated to helping seniors navigate the aging journey with confidence and independence, focusing on:
+
+- Essential health and wellness resources for older adults
+- Financial planning and retirement guidance
+- Independent living tips and practical advice
+- Caregiver support and resources
+
+## Site Structure
+
+### Main Categories
+- Health: Medical information, wellness tips, healthcare navigation
+- Finance: Retirement planning, social security, financial advice
+- Lifestyle: Independent living, hobbies, social connection
+- Caregiving: Support resources, care planning, caregiver guides
+
+### Article Format
+Each article includes:
+- Title: SEO-optimized
+- Meta description: Under 160 characters
+- Related questions: 3-5 FAQs
+- Content: HTML format with structured data
+
+## Content Principles
+
+1. **Accuracy**: All information verified from authoritative sources
+2. **Practicality**: Concrete, actionable advice for seniors
+3. **Accessibility**: Plain language, avoiding excessive jargon
+4. **Objectivity**: Multiple perspectives, no product bias
+
+## Authoritative Sources
+
+- National Institute on Aging (NIA)
+- Social Security Administration (SSA)
+- Centers for Medicare & Medicaid Services (CMS)
+- AARP
+
+## Crawlable Paths
+
+```
+/               - Homepage
+/category/*     - Category pages
+/detail/*       - Article detail pages
+/sitemap.xml    - Sitemap
+```
+
+## Restricted Paths
+
+```
+/admin/*        - Admin backend
+/api/*          - API endpoints
+/cdn-cgi/*      - CDN resources
+```
+
+## Contact
+
+Website: https://www.seniorsbetter.com
+Email: service@seniorsbetter.com
+
+---
+
+*This file is for AI/LLM crawlers to understand the site structure and content.*
+*Last updated: 2026-04-21*
