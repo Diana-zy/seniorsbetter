@@ -40,7 +40,6 @@ $tagColor3:#C0E8B2;
     left: 0;
     @include icon($width, $height,'icon-logo-m.png')
   }
-
 }
 
 @mixin btn-img($width, $height, $url) {
