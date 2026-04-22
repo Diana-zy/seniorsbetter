@@ -24,9 +24,11 @@ main {
 }
 .layout-left {
   flex: 1;
+  min-width: 0;
 }
 .content-box {
   flex: 1;
+  min-width: 0;
 }
 .layout-right,
 .aside-box {
