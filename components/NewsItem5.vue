@@ -5,7 +5,7 @@
       fit="cover"
       width="658"
       height="440"
-      :src="item.cover"
+      :src="item.cover || '/icon.png'"
       :alt="item.cover_seo_alt"
       loading="lazy"
       class="img"

@@ -7,7 +7,7 @@
             format="auto"
             fit="cover"
             width="140"
-            :src="item.cover"
+            :src="item.cover || '/icon.png'"
             :alt="item.cover_seo_alt"
             loading="lazy"
             class="img"

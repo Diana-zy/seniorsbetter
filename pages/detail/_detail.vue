@@ -41,7 +41,7 @@
               format="auto"
               fit="cover"
               width="600"
-              :src="newInfo.cover"
+              :src="newInfo.cover || '/icon.png'"
               :alt="newInfo.cover_seo_alt"
               class="article-img"
               preload

@@ -6,7 +6,7 @@
         fit="cover"
         width="654"
         height="335"
-        :src="item.cover"
+        :src="item.cover || '/icon.png'"
         :alt="item.cover_seo_alt"
         :preload="index === 0"
         :loading="index === 0 ? 'eager' : 'lazy'"
