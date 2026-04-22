@@ -70,32 +70,7 @@
         </div>
       </div>
       <div class="layout-right">
-        <div class="right-sider">
-          <div class="category-box">
-            <div class="right-title"> Categories</div>
-            <div class="category-content">
-              <CustomLink
-                v-for="(item, i) in navData?.list || []"
-                :key="i"
-                :to="`/category/${item.path}/`"
-                class="category-item"
-                >{{ capitalizeFirstLetter(item.name) }}</CustomLink
-              >
-            </div>
-          </div>
-          <div class="new-box">
-            <h2 class="title-h2"> New Articles </h2>
-            <div class="new-content">
-              <item-mode-new v-for="(item, i) in recNews" :key="i" :item="item"></item-mode-new>
-            </div>
-          </div>
-          <div class="rec-box">
-            <h2 class="title-h2"> Recommended </h2>
-            <div class="rec-content">
-              <item-mode-new v-for="(item, i) in trendingNews" :key="i" :item="item"></item-mode-new>
-            </div>
-          </div>
-        </div>
+        <right-side-box :rec-news="recNews" :trending-news="trendingNews" />
       </div>
     </main>
     <footer-seo :info="newInfo || {}" />
@@ -107,10 +82,11 @@ import { shuffleArray, capitalizeFirstLetter } from "../../utils/utils";
 import Breadcrumb from "../../components/Breadcrumb";
 import CustomLink from "../../components/CustomLink";
 import ItemModeNew from "../../components/Item/ModeNew";
+import RightSideBox from "../../components/RightSideBox";
 import { processHtmlWithToc, generateNestedToc } from "../../utils/cheerio-toc.js";
 
 export default {
-  components: { Breadcrumb, CustomLink, ItemModeNew },
+  components: { Breadcrumb, CustomLink, ItemModeNew, RightSideBox },
   async asyncData({ $axios, params, env }) {
     const path = params.detail;
     const lastDashIndex = path.lastIndexOf("-");
