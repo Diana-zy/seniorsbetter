@@ -26,6 +26,7 @@ export function generateCustomLink(url) {
   const from = matchedPathType ? matchedPathType.type : currentPathname.replaceAll("/", "");
 
   currentParams.delete("from");
+  currentParams.delete("channel");
   if (currentPathname === "/search/" || currentPathname === "/content/") {
     currentParams.delete("text");
   }
@@ -78,6 +79,7 @@ export function generateCustomPath(url) {
   const from = matchedPathType ? matchedPathType.type : currentPathname.replaceAll("/", "");
 
   currentParams.delete("from");
+  currentParams.delete("channel");
   if (currentPathname === "/search/" || currentPathname === "/content/") {
     currentParams.delete("text");
     currentParams.delete("query");
