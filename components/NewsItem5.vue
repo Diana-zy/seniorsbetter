@@ -88,6 +88,7 @@ export default {
       margin: vw(20) 0 0;
     }
     .title {
+      font-family: "Noto Sans SC";
       margin-top: vw(16);
       font-size: vw(36);
       line-height: vw(48);
@@ -102,6 +103,15 @@ export default {
       font-size: vw(26);
       padding-bottom: vw(10);
       @include author-icon(vw(26), vw(26));
+      div:first-child {
+        max-width: vw(256);
+        @include ellipsis();
+      }
+      div:last-child {
+        max-width: vw(220);
+        font-size: vw(26);
+        @include ellipsis();
+      }
     }
   }
 }

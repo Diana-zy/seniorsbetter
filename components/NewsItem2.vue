@@ -116,6 +116,15 @@ export default {
       font-weight: 300;
       padding-bottom: vw(10);
       @include author-icon(vw(26), vw(26));
+      div:first-child {
+        max-width: vw(300);
+        @include ellipsis();
+      }
+      div:last-child {
+        max-width: vw(300);
+        font-size: vw(26);
+        @include ellipsis();
+      }
     }
   }
 }
