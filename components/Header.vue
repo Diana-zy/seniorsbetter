@@ -139,19 +139,19 @@ export default {
 .header {
   position: relative;
   max-width: 1200px;
-  height: 147px;
+  height: 157px;
   margin-bottom: 0px;
   z-index: 11;
   .header-top {
     width: 100%;
-    height: 66px;
+    height: 76px;
     display: flex;
     align-items: center;
     justify-content: center;
     .logo {
       display: block;
-      width: 265px;
-      height: 40px;
+      width: 371px;
+      height: 56px;
       @include bg("logo.png");
       margin-right: 56px;
     }
@@ -243,7 +243,7 @@ export default {
     .header-top {
       height: 100%;
       justify-content: start;
-      .logo { width: vw(320); height: vw(48); @include bg("logo.png"); margin-right: 0; }
+      .logo { width: vw(371); height: vw(56); @include bg("logo.png"); margin-right: 0; }
     }
   }
   .menu-nav-list {
