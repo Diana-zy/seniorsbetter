@@ -150,9 +150,12 @@ export default {
     justify-content: center;
     .logo {
       display: block;
-      width: 371px;
+      width: 400px;
       height: 56px;
-      @include bg("logo.png");
+      background-image: url("~/assets/images/logo.png");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: left center;
       margin-right: 56px;
     }
   }
@@ -243,7 +246,7 @@ export default {
     .header-top {
       height: 100%;
       justify-content: start;
-      .logo { width: vw(371); height: vw(56); @include bg("logo.png"); margin-right: 0; }
+      .logo { width: vw(400); height: vw(60); background-image: url("~/assets/images/logo.png"); background-size: contain; background-repeat: no-repeat; background-position: left center; margin-right: 0; }
     }
   }
   .menu-nav-list {
