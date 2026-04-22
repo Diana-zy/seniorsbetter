@@ -2,6 +2,11 @@
 /* eslint-disable no-undef */
 /* eslint-disable camelcase */
 /* eslint-disable no-unused-vars */
+function isDetailPage(pathname) {
+  if (pathname.startsWith("/detail")) return true;
+  var segs = pathname.split("/").filter(Boolean);
+  return segs.length === 2 && ["category", "search", "us"].indexOf(segs[0]) === -1;
+}
 function createUserId() {
   const userId = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     const r = (Math.random() * 16) | 0;
@@ -227,7 +232,7 @@ function setDetailPvUser() {
   const { pathname } = window.location;
   const hi_source = getValueByURLOrCookie("hi_source");
   const { hi_source_clid } = getInfoBySource(hi_source);
-  if (pathname.includes("/detail")) {
+  if (isDetailPage(pathname)) {
     window.setCookieToDay("detail_time", new Date().getTime());
     const detailPvUser = window.getCookie("detailPvUser");
     if (detailPvUser) {
@@ -269,7 +274,7 @@ function setDetailPvUser() {
 }
 
 window.addEventListener("beforeunload", () => {
-  if (window.location.pathname.includes("/detail")) {
+  if (isDetailPage(window.location.pathname)) {
     const detailPvUser = window.getCookie("detailPvUser");
     try {
       const buffer = JSON.parse(detailPvUser);

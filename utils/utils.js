@@ -18,6 +18,7 @@ export function generateCustomLink(url) {
     { pattern: /^\/category\/[\w-]+\/$/, type: "category-detail" },
     { pattern: /^\/category\/$/, type: "category" },
     { pattern: /^\/detail\/.*/, type: "detail" },
+    { pattern: /^\/(?!category\/|search\/|us\/)[\w-]+\/[\w-]+\/$/, type: "detail" },
     { pattern: /^\/$/, type: "home" }
   ];
 
@@ -69,6 +70,7 @@ export function generateCustomPath(url) {
     { pattern: /^\/category\/[\w-]+\/$/, type: "category-detail" },
     { pattern: /^\/category\/$/, type: "category" },
     { pattern: /^\/detail\/.*/, type: "detail" },
+    { pattern: /^\/(?!category\/|search\/|us\/)[\w-]+\/[\w-]+\/$/, type: "detail" },
     { pattern: /^\/$/, type: "home" }
   ];
 

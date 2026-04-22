@@ -4,6 +4,11 @@
 /* eslint-disable one-var */
 /* eslint-disable no-var */
 /* eslint-disable no-unused-expressions */
+function isDetailPage(pathname) {
+  if (pathname.startsWith("/detail")) return true;
+  var segs = pathname.split("/").filter(Boolean);
+  return segs.length === 2 && ["category", "search", "us"].indexOf(segs[0]) === -1;
+}
 function getParam(queryKey) {
   try {
     const searchParams = new URLSearchParams(window.location.search);
@@ -63,7 +68,7 @@ const initPixels = {
         });
 
       ttq.load(b);
-      if (w.location.pathname.startsWith("/detail")) {
+      if (isDetailPage(w.location.pathname)) {
         ttq.page();
       }
     })(window, document, "ttq");
@@ -114,7 +119,7 @@ const initPixels = {
       script.parentNode.insertBefore(tag, script);
     })(window, document);
 
-    if (window.location.pathname.startsWith("/detail")) {
+    if (isDetailPage(window.location.pathname)) {
       window.obApi("track", "PAGE_VIEW");
     }
   },
