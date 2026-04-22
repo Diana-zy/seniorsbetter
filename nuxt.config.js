@@ -105,9 +105,7 @@ export default {
   modules: ["@nuxtjs/axios"],
   sitemap: {
     hostname: "https://www.seniorsbetter.com/",
-    filter({ routes }) {
-      return routes.filter(route => route.url && route.url.trim() !== "");
-    }
+    routes: []
   },
   pwa: {
     manifest: {
