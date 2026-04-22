@@ -19,9 +19,13 @@ export default {
         `${process.env.PROD_API_URL}/api/article/get_all_path_v2?site_id=${process.env.SITE_ID}`
       );
       const path = await pathData.json();
-      const categoryPaths = path.data.seo_category.map((item) => `/category/${item}/`);
+      const categoryPaths = path.data.seo_category
+        .filter((item) => item && String(item).trim())
+        .map((item) => `/category/${item}/`);
       // URL层级优化：保持 /detail/前缀，后端返回的path_v2已包含分类slug
-      const detailPaths = path.data.detail.map((item) => `/${item}/`);
+      const detailPaths = path.data.detail
+        .filter((item) => item && String(item).trim())
+        .map((item) => `/${item}/`);
       const urls = [...categoryPaths, ...detailPaths];
       return urls;
     }
@@ -97,14 +101,25 @@ export default {
     "~/plugins/nav-data"
   ],
   components: true,
-  buildModules: ["@nuxtjs/style-resources", "@nuxt/image","@nuxtjs/pwa", "@nuxtjs/sitemap"],
+  buildModules: ["@nuxtjs/style-resources", "@nuxt/image", "@nuxtjs/pwa"],
   css: ["@/assets/css/fonts.css", "@/assets/css/reset.css", "@/assets/css/common.scss"],
   styleResources: {
     scss: ["~/assets/css/_mixins.scss"]
   },
-  modules: ["@nuxtjs/axios"],
+  modules: ["@nuxtjs/axios", "@nuxtjs/sitemap"],
   sitemap: {
-    hostname: "https://seniorsbetter.com/"
+    hostname: "https://www.seniorsbetter.com/",
+    exclude: ["/detail/:detail", "/category/:category", "/:category/:detail"],
+    filter({ routes }) {
+      return routes.filter((route) => {
+        const url = typeof route === "string" ? route : route && route.url;
+        if (!url) return false;
+        if (url.includes(":")) return false;
+        if (url === "//" || url === "///" ) return false;
+        return true;
+      });
+    },
+    routes: []
   },
   pwa: {
     manifest: {
