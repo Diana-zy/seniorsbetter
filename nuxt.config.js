@@ -105,6 +105,10 @@ export default {
   modules: ["@nuxtjs/axios"],
   sitemap: {
     hostname: "https://www.seniorsbetter.com/",
+    exclude: ["/:category/:detail"],
+    filter({ routes }) {
+      return routes.filter((route) => !route.url.includes(":"));
+    },
     routes: []
   },
   pwa: {
