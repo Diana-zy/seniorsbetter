@@ -106,29 +106,34 @@ export default {
   styleResources: {
     scss: ["~/assets/css/_mixins.scss"]
   },
-  modules: ["@nuxtjs/axios", "@nuxtjs/sitemap"],
-  sitemap: {
-    hostname: "https://www.seniorsbetter.com/",
-    exclude: [
-      "/detail/:detail", "/detail/:detail/",
-      "/category/:category", "/category/:category/",
-      "/:category/:detail", "/:category/:detail/"
-    ],
-    filter({ routes }) {
-      const base = "https://www.seniorsbetter.com/";
-      return routes.filter((route) => {
-        try {
-          const url = typeof route === "string" ? route : (route && route.url);
-          if (!url || typeof url !== "string") return false;
-          if (url.includes("/:")) return false;
-          new URL(url, base);
-          return true;
-        } catch {
-          return false;
-        }
-      });
-    },
-    routes: []
+  modules: ["@nuxtjs/axios"],
+  hooks: {
+    'generate:done'(generator) {
+      const nodePath = require('path')
+      const fs = require('fs')
+      const hostname = 'https://www.seniorsbetter.com'
+      const today = new Date().toISOString().split('T')[0]
+
+      const routes = [...generator.generatedRoutes].filter(
+        (r) => r && typeof r === 'string' && !r.includes(':')
+      )
+
+      const urlEntries = routes
+        .map(
+          (r) =>
+            `  <url>\n    <loc>${hostname}${r}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>`
+        )
+        .join('\n')
+
+      const xml =
+        `<?xml version="1.0" encoding="UTF-8"?>\n` +
+        `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+        urlEntries +
+        `\n</urlset>`
+
+      const outputPath = nodePath.join(generator.options.generate.dir, 'sitemap.xml')
+      fs.writeFileSync(outputPath, xml, 'utf8')
+    }
   },
   pwa: {
     manifest: {
