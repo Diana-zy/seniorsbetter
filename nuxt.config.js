@@ -86,7 +86,7 @@ export default {
           "Discover essential resources, expert advice, and practical tips for seniors to enhance their well-being. Start exploring today and live a fulfilling, independent life."
       }
     ],
-    link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
+    link: [{ rel: "icon", type: "image/png", href: "/favicon.png" }]
   },
   image: {
     provider: "cloudflare",
