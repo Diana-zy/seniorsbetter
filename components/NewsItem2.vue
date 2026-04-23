@@ -87,6 +87,10 @@ export default {
   .news-style-2 {
     padding-right: 0;
     width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     .img {
       width: 100%;
       height: auto;
@@ -111,7 +115,7 @@ export default {
     .m-news-author {
       display: flex;
       justify-content: space-between;
-      margin-top: vw(12);
+      margin-top: auto;
       font-size: vw(26);
       font-weight: 300;
       padding-bottom: vw(10);
