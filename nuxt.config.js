@@ -109,14 +109,23 @@ export default {
   modules: ["@nuxtjs/axios", "@nuxtjs/sitemap"],
   sitemap: {
     hostname: "https://www.seniorsbetter.com/",
-    exclude: ["/detail/:detail", "/category/:category", "/:category/:detail"],
+    exclude: [
+      "/detail/:detail", "/detail/:detail/",
+      "/category/:category", "/category/:category/",
+      "/:category/:detail", "/:category/:detail/"
+    ],
     filter({ routes }) {
+      const base = "https://www.seniorsbetter.com/";
       return routes.filter((route) => {
-        const url = typeof route === "string" ? route : route && route.url;
-        if (!url) return false;
-        if (url.includes(":")) return false;
-        if (url === "//" || url === "///" ) return false;
-        return true;
+        try {
+          const url = typeof route === "string" ? route : (route && route.url);
+          if (!url || typeof url !== "string") return false;
+          if (url.includes("/:")) return false;
+          new URL(url, base);
+          return true;
+        } catch {
+          return false;
+        }
       });
     },
     routes: []
