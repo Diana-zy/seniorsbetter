@@ -11,7 +11,8 @@
     "lint:prettier": "prettier --check .",
     "lint": "yarn lint:js && yarn lint:prettier",
     "lint:fix": "prettier --write --list-different . && yarn lint:js --fix",
-    "go": "node ./utils/env.js && nuxt generate"
+    "go": "node ./utils/env.js && nuxt generate",
+    "deploy": "npm install && npm run go"
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
