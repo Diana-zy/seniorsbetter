@@ -28,7 +28,11 @@ exports.processHtmlWithToc = (html, levels = [1, 2, 3]) => {
     });
   });
 
-  $("table").addClass("table-container");
+  $("table").each((i, el) => {
+    const $el = $(el);
+    $el.addClass("table-container");
+    $el.wrap('<div class="table-container-parent"></div>');
+  });
 
   toc.sort((a, b) => {
     if (a.level !== b.level) {

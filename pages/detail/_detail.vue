@@ -545,11 +545,7 @@ export default {
 ::v-deep .table-container-parent {
   width: 100%;
   overflow-x: auto;
-}
-::v-deep .news-detail table,
-::v-deep .table-container {
-  display: block;
-  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .news-author {
   display: flex;
@@ -561,7 +557,7 @@ export default {
 }
 ::v-deep .table-container {
   position: relative;
-  width: 100%;
+  min-width: 100%;
   margin: 24px 0;
   border-top: 3px solid rgba($font3, 0.65);
   border-collapse: collapse;
@@ -746,13 +742,9 @@ export default {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
-  ::v-deep .news-detail table,
   ::v-deep .table-container {
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     margin: vw(30) 0;
-    width: 100%;
+    min-width: 100%;
     border-top: vw(4) solid rgba($font3, 0.65);
     tr {
       text-align: center;
