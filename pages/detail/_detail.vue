@@ -524,8 +524,9 @@ export default {
       );
     },
     handleCreateTableParentDom() {
-      let doms = Array.from(document.getElementsByClassName("table-container"));
+      let doms = Array.from(document.querySelectorAll(".news-detail table"));
       doms.forEach(dom => {
+        dom.classList.add("table-container");
         if (!dom.parentNode.classList.contains("table-container-parent")) {
           let newParent = document.createElement("div");
           newParent.setAttribute("class", "table-container-parent");

@@ -28,6 +28,8 @@ exports.processHtmlWithToc = (html, levels = [1, 2, 3]) => {
     });
   });
 
+  $("table").addClass("table-container");
+
   toc.sort((a, b) => {
     if (a.level !== b.level) {
       return a.level - b.level;
