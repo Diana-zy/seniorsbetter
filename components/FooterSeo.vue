@@ -50,7 +50,7 @@ export default {
   data() {
     return {
       input: "",
-      icon: "/logo.png"
+      icon: require("~/assets/images/logo.png")
     };
   },
   computed: {
