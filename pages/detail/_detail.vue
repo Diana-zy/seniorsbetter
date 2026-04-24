@@ -746,9 +746,10 @@ export default {
     -webkit-overflow-scrolling: touch;
   }
   ::v-deep .table-container {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     margin: vw(30) 0;
-    width: max-content;
-    min-width: 100%;
     border-top: vw(4) solid rgba($font3, 0.65);
     tr {
       text-align: center;
