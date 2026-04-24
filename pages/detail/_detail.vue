@@ -193,7 +193,9 @@ export default {
       const { toc: flatToc, htmlWithAnchor: rawHtml } = processHtmlWithToc(data.content, [2]);
       const toc = generateNestedToc(flatToc);
 
-      let htmlWithAnchor = rawHtml;
+      let htmlWithAnchor = rawHtml
+        .replace(/(<table)/g, '<div class="table-scroll-wrapper">$1')
+        .replace(/<\/table>/g, '</table></div>');
       const pEnds = [];
       const pRegex = /<\/p>/gi;
       let pMatch;
@@ -542,6 +544,7 @@ export default {
 </script>
 
 <style lang="scss">
+::v-deep .table-scroll-wrapper,
 ::v-deep .table-container-parent {
   width: 100%;
   overflow-x: auto;
@@ -746,9 +749,6 @@ export default {
     -webkit-overflow-scrolling: touch;
   }
   ::v-deep .table-container {
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     margin: vw(30) 0;
     border-top: vw(4) solid rgba($font3, 0.65);
     tr {

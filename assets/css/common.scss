@@ -229,7 +229,8 @@ $class-names: ("block", "flex", "grid");
   }
   .page {
     max-width: 100vw;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
   .title-h2 {
     font-size: vw(32);
