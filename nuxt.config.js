@@ -101,11 +101,8 @@ export default {
     "~/plugins/nav-data"
   ],
   components: true,
-  buildModules: ["@nuxtjs/style-resources", "@nuxt/image", "@nuxtjs/pwa"],
+  buildModules: ["@nuxt/image", "@nuxtjs/pwa"],
   css: ["@/assets/css/fonts.css", "@/assets/css/reset.css", "@/assets/css/common.scss"],
-  styleResources: {
-    scss: ["~/assets/css/_mixins.scss"]
-  },
   modules: ["@nuxtjs/axios"],
   hooks: {
     'generate:done'(generator) {
@@ -147,6 +144,11 @@ export default {
     }
   },
   build: {
+    loaders: {
+      scss: {
+        additionalData: '@import "~/assets/css/_mixins.scss";'
+      }
+    },
     html: {
       minify: {
         collapseWhitespace: true,
