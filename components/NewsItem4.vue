@@ -107,6 +107,19 @@ export default {
       margin-bottom: vw(26);
       @include ellipsis(2);
     }
+    .news-author {
+      margin-top: vw(13);
+      font-size: vw(22);
+      padding-bottom: vw(11);
+      @include author-icon(vw(26), vw(26));
+      div:first-child {
+        max-width: vw(260);
+        @include ellipsis();
+      }
+      div:last-child {
+        @include ellipsis();
+      }
+    }
   }
 }
 </style>

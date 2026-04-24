@@ -524,14 +524,16 @@ export default {
       );
     },
     handleCreateTableParentDom() {
-      let dom = document.getElementsByClassName("table-container")?.[0];
-      if (dom) {
-        let newParent = document.createElement("div");
-        newParent.setAttribute("class", "table-container-parent");
-        let parent = dom.parentNode;
-        parent.insertBefore(newParent, dom);
-        newParent.appendChild(dom);
-      }
+      let doms = Array.from(document.getElementsByClassName("table-container"));
+      doms.forEach(dom => {
+        if (!dom.parentNode.classList.contains("table-container-parent")) {
+          let newParent = document.createElement("div");
+          newParent.setAttribute("class", "table-container-parent");
+          let parent = dom.parentNode;
+          parent.insertBefore(newParent, dom);
+          newParent.appendChild(dom);
+        }
+      });
     },
     capitalizeFirstLetter
   }
