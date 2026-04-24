@@ -557,6 +557,7 @@ export default {
 }
 ::v-deep .table-container {
   position: relative;
+  width: max-content;
   min-width: 100%;
   margin: 24px 0;
   border-top: 3px solid rgba($font3, 0.65);
@@ -566,6 +567,7 @@ export default {
     padding: 10px;
     height: 61px;
     td {
+      min-width: 120px;
       background: rgba(#fd9a25, 0.1);
       border: 2px solid #fff;
       font-size: 14px;
@@ -578,6 +580,7 @@ export default {
   }
   tr:first-child {
     th,td {
+      min-width: 120px;
       color: $font5;
       font-size: 16px;
       border-bottom: 3px solid rgba($font3, 0.35);
@@ -744,6 +747,7 @@ export default {
   }
   ::v-deep .table-container {
     margin: vw(30) 0;
+    width: max-content;
     min-width: 100%;
     border-top: vw(4) solid rgba($font3, 0.65);
     tr {
@@ -751,6 +755,7 @@ export default {
       padding: vw(20);
       min-height: vw(122);
       td {
+        min-width: vw(200);
         background: rgba(#fd9a25, 0.1);
         border: vw(4) solid #fff;
         font-size: vw(28);
