@@ -1,0 +1,125 @@
+<template>
+  <CustomLink class="news-style-2" :to="`/${item.path_v2}/`">
+    <NuxtImg
+      format="auto"
+      fit="cover"
+      width="658"
+      height="440"
+      :src="item.cover || '/icon.png'"
+      :alt="item.cover_seo_alt"
+      :loading="index === 0 ? 'eager' : 'lazy'"
+      :preload="index === 0"
+      :fetchpriority="index === 0 ? 'high' : 'low'"
+      class="img"
+    />
+    <p class="category btn-tag" v-if="item.seo_category_name || item.category_locale_name">{{ capitalizeFirstLetter(item.seo_category_name || item.category_locale_name) }}</p>
+    <p class="title">{{ item.name }}</p>
+    <div class="news-author">
+      <div>{{ item.author.name }}</div>
+      <div>{{ item.updated_at }}</div>
+    </div>
+  </CustomLink>
+</template>
+
+<script>
+import { capitalizeFirstLetter } from "~/utils/utils";
+export default {
+  props: {
+    item: {
+      type: Object,
+      required: true
+    },
+    index: {
+      type: Number,
+      default: 0
+    }
+  },
+  methods: {
+    capitalizeFirstLetter
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.news-style-2 {
+  padding-right: 16px;
+  .img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px 8px 8px 8px;
+  }
+  .category {
+    display: inline-block;
+    padding: 4px 8px;
+    line-height: 18px;
+    font-size: 13px;
+    font-family: "hem";
+    color: $font5;
+    background: $tagColor3;
+    border-radius: 4px 4px 4px 4px;
+    margin: 16px 0 10px;
+  }
+  .title {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: bold;
+    @include ellipsis(3);
+    transition: color 0.2s;
+  }
+  &:hover {
+    .title {
+      color: $color1;
+      text-decoration: underline;
+    }
+  }
+  .news-author {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 13px;
+    font-size: 14px;
+    padding-bottom: 16px;
+    @include author-icon(25px, 25px);
+  }
+}
+@media screen and (max-width: 750px) {
+  .news-style-2 {
+    padding-right: 0;
+    width: 100%;
+    .img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      border-radius: 0;
+      margin-right: 0;
+    }
+    .category {
+      font-size: vw(24);
+      line-height: vw(44);
+      padding: vw(8) vw(16);
+      border-radius: 0;
+      margin: vw(24) 0 vw(24);
+    }
+    .title {
+      font-size: vw(36);
+      line-height: vw(48);
+      min-height: vw(96);
+      margin-bottom: vw(26);
+      @include ellipsis(2);
+    }
+    .news-author {
+      margin-top: vw(13);
+      font-size: vw(22);
+      padding-bottom: vw(11);
+      @include author-icon(vw(26), vw(26));
+      div:first-child {
+        max-width: vw(260);
+        @include ellipsis();
+      }
+      div:last-child {
+        @include ellipsis();
+      }
+    }
+  }
+}
+</style>
