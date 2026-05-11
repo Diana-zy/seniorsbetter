@@ -61,14 +61,14 @@ export default {
               site_id: env.SITE_ID,
               mod_id: "rec"
             }
-          }),
+          }).catch(() => null),
           $axios.$get("/api/article/get_all_articles", {
             params: {
               site_id: env.SITE_ID,
               size: 4,
               page: 1
             }
-          }),
+          }).catch(() => null),
           $axios.$get("/api/article/menu", {
             params: {
               site_id: env.SITE_ID,
@@ -76,12 +76,12 @@ export default {
               page: 1,
               size: 4
             }
-          }),
+          }).catch(() => null),
           $axios.$get("/api/article/get_all_seo_category", {
             params: {
               site_id: env.SITE_ID
             }
-          })
+          }).catch(() => null)
         ]);
 
       const categoryItems = (categoryResponse && categoryResponse.list) || [];
@@ -93,7 +93,7 @@ export default {
             size: 4,
             page: 1
           }
-        })
+        }).catch(() => null)
       );
       const list = await Promise.all(category);
 

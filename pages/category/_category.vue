@@ -37,7 +37,7 @@
         </section>
       </div>
       <div class="layout-right">
-        <right-side-box :rec-news="trendingNews?.list" :trending-news="recNews?.list" />
+        <right-side-box :rec-news="trendingNews?.list || []" :trending-news="recNews?.list || []" />
       </div>
     </main>
     <FooterSeo />
@@ -60,14 +60,14 @@ export default {
             site_id: env.SITE_ID,
             mod_id: "rec"
           }
-        }),
+        }).catch(() => null),
         $axios.$get("/api/article/get_all_articles", {
           params: {
             site_id: env.SITE_ID,
             size: 4,
             page: 1
           }
-        }),
+        }).catch(() => null),
         $axios.$get("/api/article/get_seo_category_page", {
           params: {
             site_id: env.SITE_ID,
@@ -75,7 +75,7 @@ export default {
             size: 10,
             page: 1
           }
-        })
+        }).catch(() => null)
       ]);
       return {
         recNews: recNewsResponse,
