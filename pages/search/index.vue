@@ -90,7 +90,7 @@ export default {
           key: this.input
         });
 
-        this.searchResultNews = response.list;
+        this.searchResultNews = response.list.filter(item => item.seo_category_path);
         this.isShowResults = true;
       } catch (error) {
         this.isShowResults = true;
