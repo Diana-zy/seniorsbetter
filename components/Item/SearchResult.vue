@@ -1,5 +1,5 @@
 <template>
-  <CustomLink class="item" :to="`/${item.path_v2.replace(/^\//, '')}/`">
+  <CustomLink class="item" :to="`/${item.seo_category_path}/${item.path_v2.replace(/^\//, '')}/`">
     <p class="title">{{ item.name }}</p>
     <p class="path">{{ formattedPath }}</p>
     <p class="desc">{{ item.first_paragraph }}</p>
@@ -16,7 +16,7 @@ export default {
   },
   computed: {
     formattedPath() {
-      return `${window.location.origin}/${this.item.path_v2.replace(/^\//, '')}/`;
+      return `${window.location.origin}/${this.item.seo_category_path}/${this.item.path_v2.replace(/^\//, '')}/`;
     }
   }
 };
