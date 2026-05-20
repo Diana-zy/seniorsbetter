@@ -6,11 +6,12 @@
         <common-page-label :title="`&quot;${input}&quot; Search Results`" />
         <div id="afscontainer1"> </div>
         <div id="relatedsearches1"> </div>
-        <h3 class="title-h3">{{ searchTitle }}</h3>
+        <!-- TODO: 搜索结果隐藏，等后端 /api/article/search 返回正确的 seo_category_path 后恢复 -->
+        <!-- <h3 class="title-h3">{{ searchTitle }}</h3>
         <section>
           <item-search-result v-for="(item, i) in searchResultNews" :key="i" :item="item">
           </item-search-result>
-        </section>
+        </section> -->
       </div>
       <div class="layout-right">
         <right-side-box :rec-news="trendingNews?.list" :trending-news="recNews?.list" />
