@@ -414,7 +414,17 @@ export default {
 
   mounted: function () {
     this.handleCreateTableParentDom();
-    this.channelId = this.newInfo?.channel || "";
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has("channel")) {
+      this.channelId = searchParams.get("channel");
+    } else {
+      this.channelId = this.newInfo?.channel || "";
+      if (this.channelId !== "") {
+        searchParams.set("channel", this.channelId);
+        const newUrl = `${window.location.origin}${window.location.pathname}?${searchParams.toString()}`;
+        window.history.replaceState({}, "", newUrl);
+      }
+    }
     this.$nextTick(() => {
       this.handleAdsScript();
     });
