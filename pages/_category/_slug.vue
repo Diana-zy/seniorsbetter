@@ -93,7 +93,7 @@ export default {
         if (response.data && Array.isArray(response.data)) return response.data;
         return [];
       };
-      data.content = data.content.replace(/font-family:\s*['"]?\s*\u5b8b\u4f53\s*['"]?;/g, "");
+      data.content = data.content.replace(/font-family:\s*['"]?\s*宋体\s*['"]?;/g, "");
       data.content = data.content.replace(/<\/h4><p><br><br>|<br><br><\/p><h4>/g, (match) => match.includes("</h4><p>") ? "</h4><p>" : "</p><h4>");
       const { toc: flatToc, htmlWithAnchor } = processHtmlWithToc(data.content, [2]);
       const toc = generateNestedToc(flatToc);
@@ -156,10 +156,6 @@ export default {
       this.channelId = searchParams.get("channel");
     } else {
       this.channelId = (this.newInfo && this.newInfo.channel) || "";
-      if (this.channelId !== "") {
-        searchParams.set("channel", this.channelId);
-        window.history.replaceState({}, "", window.location.origin + window.location.pathname + "?" + searchParams.toString());
-      }
     }
     setTimeout(() => { this.newInfo && this.newInfo.no_entry !== 1 && this.addAdSenseScript(); }, 0);
   },
@@ -171,7 +167,7 @@ export default {
     addAdSenseScript() {
       const searchParams = new URLSearchParams(window.location.search);
       let terms = searchParams.has("terms") ? searchParams.get("terms") : "";
-      terms = terms.replace(/[\uff0c]/g, ",");
+      terms = terms.replace(/[，]/g, ",");
       let headline = searchParams.has("headline") ? searchParams.get("headline") : "";
       if (headline === "{title}" || headline === "{{ad_title}}") headline = "";
       const paramKeys = [];
