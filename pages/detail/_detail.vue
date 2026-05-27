@@ -648,13 +648,6 @@ export default {
   color: $font5;
   p {
   }
-  ::v-deep a {
-    color: #2563eb;
-    text-decoration: underline;
-    &:hover {
-      color: #1d4ed8;
-    }
-  }
 }
 .read-more {
   line-height: 4;
