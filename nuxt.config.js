@@ -15,19 +15,27 @@ export default {
     concurrency: 1,
     interval: 2000,
     async routes() {
-      const pathData = await fetch(
+      const fetchWithRetry = async (url, retries = 4, delay = 2000) => {
+        for (let i = 0; i < retries; i++) {
+          try {
+            return await fetch(url);
+          } catch (e) {
+            if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+            else throw e;
+          }
+        }
+      };
+      const pathData = await fetchWithRetry(
         `${process.env.PROD_API_URL}/api/article/get_all_path_v2?site_id=${process.env.SITE_ID}`
       );
       const path = await pathData.json();
       const categoryPaths = path.data.seo_category
         .filter((item) => item && String(item).trim())
         .map((item) => `/category/${item}/`);
-      // URL层级优化：保持 /detail/前缀，后端返回的path_v2已包含分类slug
       const detailPaths = path.data.detail
         .filter((item) => item && String(item).trim())
         .map((item) => `/${item}/`);
-      const urls = [...categoryPaths, ...detailPaths];
-      return urls;
+      return [...categoryPaths, ...detailPaths];
     }
   },
   axios: {
