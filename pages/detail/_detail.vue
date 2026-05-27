@@ -648,11 +648,14 @@ export default {
   color: $font5;
   p {
   }
-  ::v-deep a {
-    color: #2563eb !important;
-    text-decoration: underline !important;
+  ::v-deep p a,
+  ::v-deep li a,
+  ::v-deep h2 a,
+  ::v-deep h3 a {
+    color: #2563eb;
+    text-decoration: underline;
     &:hover {
-      color: #1d4ed8 !important;
+      color: #1d4ed8;
     }
   }
 }
