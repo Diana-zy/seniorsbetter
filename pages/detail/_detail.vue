@@ -229,8 +229,8 @@ export default {
         toc,
         id,
         htmlWithAnchor,
-        recNews: extractList(trendingNewsResponse),
-        trendingNews: extractList(recNewsResponse),
+        recNews: extractList(recNewsResponse),
+        trendingNews: extractList(trendingNewsResponse),
         articleFaqs
       };
     } catch (error) {
