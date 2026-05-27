@@ -11,7 +11,7 @@
     <div class="menu">
       <div class="category">
         <ul class="dropdown">
-          <li v-for="(item, i) in (navData && navData.list || []).slice(0, 6)" :key="i"
+          <li v-for="(item, i) in navData.list.slice(0, 6)" :key="i"
             ><CustomLink :to="`/category/${item.path}/`">{{ capitalizeFirstLetter(item.name) }}</CustomLink></li
           >
         </ul>
