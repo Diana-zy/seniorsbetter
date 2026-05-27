@@ -649,10 +649,10 @@ export default {
   p {
   }
   ::v-deep a {
-    color: #2563eb;
-    text-decoration: underline;
+    color: #2563eb !important;
+    text-decoration: underline !important;
     &:hover {
-      color: #1d4ed8;
+      color: #1d4ed8 !important;
     }
   }
 }
