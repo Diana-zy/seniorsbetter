@@ -360,13 +360,13 @@ export default {
             ],
             mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": `https://www.seniorsbetter.com/${this.newInfo?.path_v2 || ""}/`
+              "@id": `https://seniorsbetter.com/${this.newInfo?.path_v2 || ""}/`
             },
             publisher: {
               "@type": "NewsMediaOrganization",
               name: "Seniors Better",
-              url: "https://www.seniorsbetter.com",
-              publishingPrinciples: "https://www.seniorsbetter.com/us/",
+              url: "https://seniorsbetter.com",
+              publishingPrinciples: "https://seniorsbetter.com/us/",
               sameAs: this.$sameAs
             },
             image: [
@@ -385,7 +385,7 @@ export default {
                 "@type": "ListItem",
                 position: 1,
                 item: {
-                  "@id": "https://www.seniorsbetter.com/",
+                  "@id": "https://seniorsbetter.com/",
                   name: "Home"
                 }
               },
@@ -393,7 +393,7 @@ export default {
                 "@type": "ListItem",
                 position: 2,
                 item: {
-                  "@id": `https://www.seniorsbetter.com/category/${this.newInfo?.category_id || ""}/`,
+                  "@id": `https://seniorsbetter.com/category/${this.newInfo?.category_id || ""}/`,
                   name: this.newInfo?.category_name || ""
                 }
               },
@@ -401,7 +401,7 @@ export default {
                 "@type": "ListItem",
                 position: 3,
                 item: {
-                  "@id": `https://www.seniorsbetter.com/${this.newInfo?.path_v2 || ""}/`,
+                  "@id": `https://seniorsbetter.com/${this.newInfo?.path_v2 || ""}/`,
                   name: this.newInfo?.name || ""
                 }
               }
