@@ -116,7 +116,7 @@ export default {
     'generate:done'(generator) {
       const nodePath = require('path')
       const fs = require('fs')
-      const hostname = 'https://www.seniorsbetter.com'
+      const hostname = 'https://seniorsbetter.com'
       const today = new Date().toISOString().split('T')[0]
 
       const routes = [...generator.generatedRoutes].filter(

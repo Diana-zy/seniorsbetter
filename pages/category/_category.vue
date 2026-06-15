@@ -103,7 +103,7 @@ export default {
     const itemListElements = this.categoryInfo?.list?.map((item, index) => ({
       "@type": "ListItem",
       position: index + 1,
-      url: `https://www.seniorsbetter.com/${item.path_v2}/`
+      url: `https://seniorsbetter.com/${item.path_v2}/`
     })) || [];
 
     return {
@@ -127,7 +127,7 @@ export default {
         {
           hid: "og:url",
           property: "og:url",
-          content: `https://www.seniorsbetter.com/category/${this.id}/`
+          content: `https://seniorsbetter.com/category/${this.id}/`
         },
         {
           hid: "og:type",
@@ -146,7 +146,7 @@ export default {
                 "@type": "ListItem",
                 position: 1,
                 item: {
-                  "@id": "https://www.seniorsbetter.com/",
+                  "@id": "https://seniorsbetter.com/",
                   name: "Home"
                 }
               },
@@ -154,7 +154,7 @@ export default {
                 "@type": "ListItem",
                 position: 2,
                 item: {
-                  "@id": `https://www.seniorsbetter.com/category/${this.id}/`,
+                  "@id": `https://seniorsbetter.com/category/${this.id}/`,
                   name: this.categoryInfo?.seo_category?.name || ""
                 }
               }
