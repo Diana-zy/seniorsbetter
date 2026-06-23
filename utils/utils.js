@@ -130,3 +130,14 @@ export function handleCreatScriptSchema(data) {
   script.innerText = data;
   document.head.appendChild(script);
 }
+
+export function toAuthorSlug(name, id) {
+  if (!name || !id) return `author-${id}`;
+  const slug = name
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return slug ? `${slug}-${id}` : `author-${id}`;
+}
