@@ -569,7 +569,7 @@ export default {
   justify-content: space-between;
   margin-top: 13px;
   font-size: 14px;
-<br>  padding-bottom: 16px;
+  padding-bottom: 16px;
   @include author-icon(25px, 25px);
 
   .author-link {
