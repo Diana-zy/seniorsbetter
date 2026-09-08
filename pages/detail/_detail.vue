@@ -427,18 +427,13 @@ export default {
       this.channelId = searchParams.get("channel");
     } else {
       this.channelId = this.newInfo?.channel || "";
-      // URL本身没带channel、从文章配置兜底取到的情况下，把channel写回当前URL——
-      // handleRequestAdByChannel()和getResultsPageUrl()都是直接从
-      // window.location.search现读channel，不经过this.channelId这层，如果这里
-      // 不回写，详情页会用兜底值请求广告，但漏斗状态记在URL原本的空channel桶下，
-      // 后续结果页从resultsPageBaseUrl带着兜底channel过去一查，对不上号，
-      // 广告请求会被漏斗校验误挡
+      // URL本身没带channel、从文章配置兜底取到的情况下，不改当前URL（避免
+      // 碰到SEO文章的地址栏），改成写一个当次访问的短期cookie，供
+      // handleRequestAdByChannel()在URL读不到channel时兜底读取——保证
+      // 详情页和后续结果页对同一次访问判断出一致的channel，不然详情页记录
+      // 的漏斗状态和结果页读到的channel对不上号，广告请求会被误挡
       if (this.channelId !== "") {
-        searchParams.set("channel", this.channelId);
-        const newUrl = `${window.location.origin}${
-          window.location.pathname
-        }?${searchParams.toString()}`;
-        window.history.replaceState({}, "", newUrl);
+        window.setCookie("hi_channel_fallback", this.channelId, 1);
       }
     }
     window.handleRequestAdByChannel("mounted", 1);

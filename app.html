@@ -253,7 +253,12 @@
       }
       function handleRequestAdByChannel(key, val, req) {
         const searchParams = new URLSearchParams(window.location.search);
-        const channel = searchParams.has("channel") ? searchParams.get("channel") : "";
+        // URL没带channel时，兜底读详情页mounted()写的hi_channel_fallback cookie
+        // （文章自带channel、URL本身没带的场景）——不依赖改写URL，保证同一次
+        // 访问里详情页记录的漏斗状态和结果页读到的channel用的是同一个值
+        const channel = searchParams.has("channel")
+          ? searchParams.get("channel")
+          : window.getCookie("hi_channel_fallback") || "";
         if (!window.getCookie("requestAdByChannel")) {
           if (req) {
             if (!key) reportFunnelBlock("detail_not_mounted");
