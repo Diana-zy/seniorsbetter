@@ -421,6 +421,7 @@ export default {
   },
 
   mounted: function () {
+    window.handleRequestAdByChannel("mounted", 1);
     this.handleCreateTableParentDom();
     const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.has("channel")) {
@@ -500,6 +501,7 @@ export default {
             if (response) {
               window.trackEventToPixel("D_C_AC");
               window.pushEventParamsToGtm("C_AC");
+              window.handleRequestAdByChannel("query_ad", 1);
               const hi_user_source = window.getValueByURLOrCookie("hi_source");
               if (hi_user_source === "unknown") {
                 window.dataLayer.push({

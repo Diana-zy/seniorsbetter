@@ -242,6 +242,82 @@
       }
     </script>
     <script>
+      // 详情页漏斗完整性检查（移植自fastofeeds反作弊方案）：结果页请求广告前
+      // 必须确认这个channel真实经过了"详情页加载→词条展示→词条点击"，缺任一
+      // 环节都不请求广告。这条不依赖clickid，SEO自然流量和投放流量统一适用——
+      // 挡的是直接拿结果页URL批量刷量/爬虫这类最低成本的假量路径
+      function reportFunnelBlock(reason) {
+        if (window.pushEventParamsToGtm) {
+          window.pushEventParamsToGtm("Q_AR_NOT", { why_ad_block: reason });
+        }
+      }
+      function handleRequestAdByChannel(key, val, req) {
+        const searchParams = new URLSearchParams(window.location.search);
+        const channel = searchParams.has("channel") ? searchParams.get("channel") : "";
+        if (!window.getCookie("requestAdByChannel")) {
+          if (req) {
+            if (!key) reportFunnelBlock("detail_not_mounted");
+            return false;
+          }
+          let buffer = {};
+          buffer[channel] = {};
+          buffer[channel][key] = val;
+          setCookieToDay("requestAdByChannel", JSON.stringify(buffer));
+        } else {
+          try {
+            let buffer = JSON.parse(window.getCookie("requestAdByChannel"));
+            if (!buffer[channel]) {
+              if (req) {
+                if (!key) reportFunnelBlock("detail_not_mounted");
+                return false;
+              }
+              buffer[channel] = {};
+              buffer[channel][key] = val;
+              setCookieToDay("requestAdByChannel", JSON.stringify(buffer));
+            } else {
+              if (req) {
+                if (
+                  !buffer[channel].first &&
+                  buffer[channel]?.mounted &&
+                  buffer[channel]?.query_ad &&
+                  buffer[channel]?.click_ad
+                ) {
+                  buffer[channel].first = val;
+                  setCookieToDay("requestAdByChannel", JSON.stringify(buffer));
+                  return true;
+                } else if (buffer[channel].first && buffer[channel].first !== "ok" && !key) {
+                  // 完成过一次完整漏斗后，同渠道后续请求不再重新校验四项是否
+                  // 齐全，只做次数计数上报，不限制请求次数
+                  buffer[channel].requestSeq = (buffer[channel].requestSeq || 1) + 1;
+                  setCookieToDay("requestAdByChannel", JSON.stringify(buffer));
+                  if (window.pushEventParamsToGtm) {
+                    window.pushEventParamsToGtm("Q_AR", { ad_request_seq: buffer[channel].requestSeq });
+                  }
+                  return true;
+                } else {
+                  if (!key) {
+                    if (!buffer[channel]?.mounted) {
+                      reportFunnelBlock("detail_not_mounted");
+                    } else if (!buffer[channel]?.query_ad) {
+                      reportFunnelBlock("no_terms_shown");
+                    } else if (!buffer[channel]?.click_ad) {
+                      reportFunnelBlock("no_terms_click");
+                    } else {
+                      reportFunnelBlock("unknown");
+                    }
+                  }
+                  return false;
+                }
+              } else {
+                buffer[channel][key] = val;
+                setCookieToDay("requestAdByChannel", JSON.stringify(buffer));
+              }
+            }
+          } catch (e) {}
+        }
+      }
+    </script>
+    <script>
       function getMainDomain() {
         const url = window.location.hostname;
         const parts = url.split(".");
@@ -643,8 +719,20 @@
         window.setCookie("hi_ttclid", ttclid);
       }
 
+      window.isLoadAd = false;
+      let hiUid = window.getCookie("hi_user_id");
+      if (!hiUid) {
+        hiUid = createUserId();
+        window.setCookie("hi_user_id", hiUid);
+      }
+      window.hiUid = hiUid;
+
       const script = document.createElement("script");
-      script.src = "https://wc.bunchthings.com/youknowwho.js?" + Date.now();
+      script.src =
+        "https://wc.bunchthings.com/youknowwho.js?t=" +
+        Date.now() +
+        "&uid=" +
+        encodeURIComponent(window.hiUid);
       document.head.appendChild(script);
       script.onload = function () {
         window.dataLayer = window.dataLayer || [];
@@ -652,6 +740,116 @@
           hi_ip: window.youknowwho_ip || "unknown",
           hi_country: window.youknowwho_ip_country || "unknown"
         });
+
+        // 判断是否切换IP/城市（稳健版：解析不到城市不算变化，连续多次不一致+
+        // 带过期时间才拉黑，移植自fastofeeds反作弊方案，不区分投放/SEO流量）
+        (function () {
+          const MAX_MISMATCH_BEFORE_BLOCK = 2; // 连续2次不一致才拉黑，不是1次就拉黑
+          const BLOCK_EXPIRE_DAYS = 3; // 拉黑状态3天后自动恢复，不是永久
+          const STATE_COOKIE_DAYS = 30; // 状态记录保留30天，足够覆盖判断周期
+
+          const loadAdEvent = new Event("loadAd");
+          const currentCity = window.city;
+
+          if (!currentCity) {
+            window.isLoadAd = true;
+            window.dispatchEvent(loadAdEvent);
+            return;
+          }
+
+          let state = {};
+          try {
+            state = JSON.parse(window.getCookie("cityCheckState") || "{}");
+          } catch (e) {
+            state = {};
+          }
+
+          if (
+            state.blockedAt &&
+            Date.now() - state.blockedAt > BLOCK_EXPIRE_DAYS * 24 * 60 * 60 * 1000
+          ) {
+            state = {};
+          }
+
+          if (state.blockedAt) {
+            window.isLoadAd = false;
+            window.dispatchEvent(new Event("adGateCityBlocked"));
+            return;
+          }
+
+          if (!state.city) {
+            state.city = currentCity;
+            state.mismatchCount = 0;
+            window.isLoadAd = true;
+            window.dispatchEvent(loadAdEvent);
+          } else if (state.city === currentCity) {
+            state.mismatchCount = 0;
+            window.isLoadAd = true;
+            window.dispatchEvent(loadAdEvent);
+          } else {
+            state.mismatchCount = (state.mismatchCount || 0) + 1;
+            if (state.mismatchCount >= MAX_MISMATCH_BEFORE_BLOCK) {
+              state.blockedAt = Date.now();
+              window.isLoadAd = false;
+              window.dispatchEvent(new Event("adGateCityBlocked"));
+            } else {
+              state.city = currentCity;
+              window.isLoadAd = true;
+              window.dispatchEvent(loadAdEvent);
+            }
+          }
+
+          window.setCookie("cityCheckState", JSON.stringify(state), STATE_COOKIE_DAYS);
+        })();
+      };
+
+      // clickid跨用户复用检测 + 进站IP/资源加载IP对比，请求Worker统一判断。
+      // seniorsbetter同时有SEO自然流量和投放流量，跟纯投放站点(fastofeeds等)
+      // 不一样——只有hi_source确实指向一个已识别的投放渠道时才做clid存在性
+      // 校验；真正的SEO自然访问(hi_source未知)本来就不带clickid，直接放行，
+      // 不能照搬fastofeeds原逻辑无差别拦截，否则会连SEO流量的广告请求也一起挡掉
+      window.checkAdGate = function () {
+        try {
+          const hi_source = getValueByURLOrCookie("hi_source");
+          if (hi_source === "unknown") {
+            return Promise.resolve({
+              ok: true,
+              ipMismatch: false,
+              clickidUserCount: null,
+              noClid: true
+            });
+          }
+          const { hi_source_clid } = getInfoBySource(hi_source);
+          if (!hi_source_clid || hi_source_clid === "unknown") {
+            return Promise.resolve({
+              ok: false,
+              ipMismatch: false,
+              clickidUserCount: null,
+              noClid: true
+            });
+          }
+          return fetch("https://wc.bunchthings.com/api/ad-gate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ uid: window.hiUid || "", clickid: hi_source_clid })
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.clickidUserCount != null && window.pushEventParamsToGtm) {
+                window.pushEventParamsToGtm("Clickid_Reuse_Observed", {
+                  clickid_reuse_count: data.clickidUserCount
+                });
+              }
+              return {
+                ok: !data.block,
+                ipMismatch: !!data.ipMismatch,
+                clickidUserCount: data.clickidUserCount != null ? data.clickidUserCount : null
+              };
+            })
+            .catch(() => ({ ok: true, ipMismatch: false, clickidUserCount: null }));
+        } catch (e) {
+          return Promise.resolve({ ok: true, ipMismatch: false, clickidUserCount: null });
+        }
       };
     </script>
     <script async="async" src="https://www.google.com/adsense/search/ads.js"></script>
@@ -938,6 +1136,7 @@
             } else {
               eventName = "T_AC";
               TACChangeCookie();
+              window.handleRequestAdByChannel("click_ad", 1);
               if (hi_user_source === "unknown") {
                 if (window.location.pathname.startsWith("/detail/")) {
                   let path = window.location.pathname.split("/")[2];
@@ -995,6 +1194,7 @@
         const src = activeElement?.getAttribute("src") || "";
         if (src.includes("afs/ads?")) {
           if (!activeElement.getAttribute("title")) {
+            window.handleRequestAdByChannel("click_ad", 1);
             window.trackEventToPixel("T_AC_MSG");
             dataLayer.push({ event: "T_AC_MSG", hi_time: handleTACMSGToLoad() });
             window.done1 = true;

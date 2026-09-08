@@ -65,6 +65,8 @@ export default {
     }
   },
   mounted() {
+    window.handleRequestAdByChannel("first", 3, true);
+
     const searchParams = new URLSearchParams(window.location.search);
     this.channelId = searchParams.has("channel") ? searchParams.get("channel") : "";
     if (searchParams.has("from") && searchParams.get("from") === "detail") {
@@ -73,15 +75,47 @@ export default {
     window.setCookie("SEO_detail", "");
 
     this.input = this.$route.query.query || "";
-    this.input && this.addAdSense();
+    if (this.input) {
+      // 未请求广告的原因统一上报到Q_AR_NOT事件，why_ad_block区分具体原因，
+      // 方便在GA4里统计"广告没请求"里各原因各占多少
+      const reportAdNotRequested = why => {
+        window.pushEventParamsToGtm("Q_AR_NOT", { why_ad_block: why });
+      };
+      const proceedAfterAdGate = () => {
+        window.checkAdGate().then(gate => {
+          if (gate.ok) {
+            this.addAdSense();
+          } else {
+            reportAdNotRequested(
+              gate.ipMismatch ? "ip_mismatch" : gate.noClid ? "no_clid" : "unknown"
+            );
+          }
+        });
+      };
+      if (window.isLoadAd === true) {
+        proceedAfterAdGate();
+      } else {
+        window.addEventListener("loadAd", proceedAfterAdGate);
+        // 进站IP解析城市变化被拉黑：youknowwho.js里的判断会让loadAd事件
+        // 永远不触发（也就不会走到上面的checkAdGate），单独用另一个事件名
+        // 兜底监听，避免这种情况完全没有埋点
+        window.addEventListener(
+          "adGateCityBlocked",
+          () => reportAdNotRequested("city_changed"),
+          { once: true }
+        );
+      }
+    }
     this.input && this.searchNews();
   },
   methods: {
     addAdSense() {
       setTimeout(() => {
-        window.pushEventParamsToGtm("Q_AR");
-        window.trackEventToPixel("Q_AR");
-        this.addAdSenseScript();
+        if (window.handleRequestAdByChannel("", "", true)) {
+          window.pushEventParamsToGtm("Q_AR");
+          window.trackEventToPixel("Q_AR");
+          this.addAdSenseScript();
+        }
       }, 0);
     },
     async searchNews() {
