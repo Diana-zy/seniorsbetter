@@ -421,14 +421,27 @@ export default {
   },
 
   mounted: function () {
-    window.handleRequestAdByChannel("mounted", 1);
     this.handleCreateTableParentDom();
     const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.has("channel")) {
       this.channelId = searchParams.get("channel");
     } else {
       this.channelId = this.newInfo?.channel || "";
+      // URL本身没带channel、从文章配置兜底取到的情况下，把channel写回当前URL——
+      // handleRequestAdByChannel()和getResultsPageUrl()都是直接从
+      // window.location.search现读channel，不经过this.channelId这层，如果这里
+      // 不回写，详情页会用兜底值请求广告，但漏斗状态记在URL原本的空channel桶下，
+      // 后续结果页从resultsPageBaseUrl带着兜底channel过去一查，对不上号，
+      // 广告请求会被漏斗校验误挡
+      if (this.channelId !== "") {
+        searchParams.set("channel", this.channelId);
+        const newUrl = `${window.location.origin}${
+          window.location.pathname
+        }?${searchParams.toString()}`;
+        window.history.replaceState({}, "", newUrl);
+      }
     }
+    window.handleRequestAdByChannel("mounted", 1);
     this.$nextTick(() => {
       this.handleAdsScript();
     });
