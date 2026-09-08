@@ -262,9 +262,14 @@ export default {
   head() {
     const seoTitle = this.newInfo?.seo_title || this.newInfo?.name;
     const seoDesc = this.newInfo?.seo_desc;
+    // 投放专用落地页文章(is_ad_landing_page)不参与本站SEO索引体系，后端只
+    // 打标记，noindex的实际渲染要靠各站点前端自己消费这个字段——这里补上
     return {
       title: seoTitle ? `${seoTitle} - Seniors Better` : "Seniors Better",
       meta: [
+        ...(this.newInfo?.is_ad_landing_page
+          ? [{ hid: "robots", name: "robots", content: "noindex, nofollow" }]
+          : []),
         {
           hid: "description",
           name: "description",
