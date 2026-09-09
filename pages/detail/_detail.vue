@@ -262,12 +262,17 @@ export default {
   head() {
     const seoTitle = this.newInfo?.seo_title || this.newInfo?.name;
     const seoDesc = this.newInfo?.seo_desc;
-    // 投放专用落地页文章(is_ad_landing_page)不参与本站SEO索引体系，后端只
-    // 打标记，noindex的实际渲染要靠各站点前端自己消费这个字段——这里补上
+    // is_seo字段在文章创建时就定好、不会被后续上架/渠道绑定流程覆盖（BI后端
+    // 2026-09-09确认），用它区分"真SEO文章"和"投放落地页"——不是SEO文章
+    // 就不参与本站SEO索引体系，加noindex。这里只在明确拿到is_seo=false/0
+    // 时才加noindex，字段缺失(undefined/null，比如接口异常没返回)时不加——
+    // 避免因为接口临时缺字段就把正常SEO文章也一起隔离掉
+    const isNonSeoArticle =
+      this.newInfo && (this.newInfo.is_seo === false || this.newInfo.is_seo === 0);
     return {
       title: seoTitle ? `${seoTitle} - Seniors Better` : "Seniors Better",
       meta: [
-        ...(this.newInfo?.is_ad_landing_page
+        ...(isNonSeoArticle
           ? [{ hid: "robots", name: "robots", content: "noindex, nofollow" }]
           : []),
         {
