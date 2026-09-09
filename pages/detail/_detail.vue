@@ -227,6 +227,23 @@ export default {
         }
       ];
 
+      // 构建期(nuxt generate)顺手记一笔is_seo，供nuxt.config.js生成sitemap时
+      // 排除投放落地页用——这个页面本来就要请求一次/api/article/detail，
+      // 不产生额外请求。process.server && process.static保证只在构建期跑，
+      // 不影响dev模式/客户端导航。文件名要跟nuxt.config.js里的保持一致
+      if (process.server && process.static) {
+        try {
+          const fs = require("fs");
+          const nodePath = require("path");
+          // 用process.cwd()而不是__dirname——.vue文件的<script>会经过webpack
+          // 打包，__dirname在打包产物里不保证还是源码目录的真实路径，
+          // process.cwd()是运行时的真实进程当前目录，构建时就是项目根目录，
+          // 跟nuxt.config.js里的__dirname(项目根目录)能对上
+          const seoFlagsFile = nodePath.join(process.cwd(), ".seo-flags.jsonl");
+          fs.appendFileSync(seoFlagsFile, JSON.stringify({ path: `/detail/${path}/`, is_seo: data.is_seo }) + "\n");
+        } catch (e) {}
+      }
+
       return {
         newInfo: data,
         all: allResponse,
