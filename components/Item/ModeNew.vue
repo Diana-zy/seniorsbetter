@@ -1,5 +1,5 @@
 <template>
-  <CustomLink :to="`/${item.path_v2}/`">
+  <CustomLink :to="buildArticleUrl(item.path_v2)">
     <div class="mode-new">
       <div>
         <div class="img-box">
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { capitalizeFirstLetter } from "~/utils/utils";
+import { capitalizeFirstLetter, buildArticleUrl } from "~/utils/utils";
 export default {
   name: "ModeNew",
   props: {
@@ -44,7 +44,8 @@ export default {
     }
   },
   methods: {
-    capitalizeFirstLetter
+    capitalizeFirstLetter,
+    buildArticleUrl
   }
 };
 </script>

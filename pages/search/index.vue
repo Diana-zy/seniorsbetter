@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { filterSeoArticles } from "~/utils/utils";
 export default {
   async asyncData({ $axios, env }) {
     try {
@@ -40,6 +41,10 @@ export default {
           }
         })
       ]);
+      // 侧边栏这两个列表要过滤掉非SEO文章(投放落地页)，避免混进正常内容
+      // 展示、影响站点SEO效果
+      if (recNewsResponse) recNewsResponse.list = filterSeoArticles(recNewsResponse.list);
+      if (trendingNewsResponse) trendingNewsResponse.list = filterSeoArticles(trendingNewsResponse.list);
       return {
         recNews: recNewsResponse,
         trendingNews: trendingNewsResponse

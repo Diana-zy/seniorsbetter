@@ -83,7 +83,7 @@
 </template>
 
 <script>
-import { shuffleArray, capitalizeFirstLetter, toAuthorSlug } from "../../utils/utils";
+import { shuffleArray, capitalizeFirstLetter, toAuthorSlug, filterSeoArticles, buildArticleUrl } from "../../utils/utils";
 import Breadcrumb from "../../components/Breadcrumb";
 import CustomLink from "../../components/CustomLink";
 import ItemModeNew from "../../components/Item/ModeNew";
@@ -107,6 +107,11 @@ export default {
             related_num: 3
           }
         });
+        if (data && data.related_articles) {
+          // 相关文章推荐里也要排除非SEO文章(投放落地页)——SEO文章不该
+          // 内链到投放落地页，避免影响站点SEO效果
+          data.related_articles = filterSeoArticles(data.related_articles);
+        }
       } catch (detailError) {
         console.error(`Failed to fetch detail for ID ${id}:`, detailError);
         return {
@@ -255,15 +260,17 @@ export default {
         } catch (e) {}
       }
 
+      // 侧边栏/相关文章这几个列表都要过滤掉非SEO文章(投放落地页)，避免混进
+      // 正常内容展示、影响站点SEO效果
       return {
         newInfo: data,
         all: allResponse,
-        floatArray: shuffleArray(allResponse?.list?.slice() || []),
+        floatArray: shuffleArray(filterSeoArticles(allResponse?.list?.slice() || [])),
         toc,
         id,
         htmlWithAnchor,
-        recNews: extractList(recNewsResponse),
-        trendingNews: extractList(trendingNewsResponse),
+        recNews: filterSeoArticles(extractList(recNewsResponse)),
+        trendingNews: filterSeoArticles(extractList(trendingNewsResponse)),
         articleFaqs
       };
     } catch (error) {
@@ -321,7 +328,7 @@ export default {
         {
           hid: "og:url",
           property: "og:url",
-          content: `https://seniorsbetter.com/${this.newInfo?.path_v2}/`
+          content: `https://seniorsbetter.com${buildArticleUrl(this.newInfo?.path_v2)}`
         },
         {
           hid: "og:locale",
@@ -356,7 +363,7 @@ export default {
         {
           hid: "twitter:url",
           property: "twitter:url",
-          content: `https://seniorsbetter.com/${this.newInfo?.path_v2}/`
+          content: `https://seniorsbetter.com${buildArticleUrl(this.newInfo?.path_v2)}`
         },
         {
           hid: "twitter:locale",
@@ -406,7 +413,7 @@ export default {
             ],
             mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": `https://seniorsbetter.com/${this.newInfo?.path_v2 || ""}/`
+              "@id": `https://seniorsbetter.com${this.newInfo?.path_v2 ? buildArticleUrl(this.newInfo.path_v2) : "/"}`
             },
             publisher: {
               "@type": "NewsMediaOrganization",
@@ -447,7 +454,7 @@ export default {
                 "@type": "ListItem",
                 position: 3,
                 item: {
-                  "@id": `https://seniorsbetter.com/${this.newInfo?.path_v2 || ""}/`,
+                  "@id": `https://seniorsbetter.com${this.newInfo?.path_v2 ? buildArticleUrl(this.newInfo.path_v2) : "/"}`,
                   name: this.newInfo?.name || ""
                 }
               }
