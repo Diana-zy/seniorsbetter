@@ -152,7 +152,8 @@ export default {
           $axios.$get("/api/article/menu", {
             params: {
               site_id: env.SITE_ID,
-              mod_id: "rec"
+              mod_id: "rec",
+              size: 20
             }
           }).catch(err => {
             console.error("recNews API error:", err.message);
