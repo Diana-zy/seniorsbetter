@@ -162,7 +162,7 @@ export default {
           $axios.$get("/api/article/get_all_articles", {
             params: {
               site_id: env.SITE_ID,
-              size: 4,
+              size: 20,
               page: 1
             }
           }).catch(err => {
@@ -271,7 +271,7 @@ export default {
         id,
         htmlWithAnchor,
         recNews: filterSeoArticles(extractList(recNewsResponse)),
-        trendingNews: filterSeoArticles(extractList(trendingNewsResponse)),
+        trendingNews: filterSeoArticles(extractList(trendingNewsResponse)).slice(0, 4),
         articleFaqs
       };
     } catch (error) {
