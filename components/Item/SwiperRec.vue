@@ -1,5 +1,5 @@
 <template>
-  <CustomLink class="swiper-rec" :to="`/${item.path_v2}/`">
+  <CustomLink class="swiper-rec" :to="buildArticleUrl(item.path_v2)">
     <div class="swiper-rec-img">
       <NuxtImg
         format="auto"
@@ -33,11 +33,15 @@
 </template>
 
 <script>
+import { buildArticleUrl } from "~/utils/utils";
 export default {
   name: "SwiperRec",
   props: {
     item: { type: Object, required: true },
     index: { type: Number, required: true }
+  },
+  methods: {
+    buildArticleUrl
   }
 };
 </script>

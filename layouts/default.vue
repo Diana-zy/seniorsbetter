@@ -23,7 +23,7 @@ export default {
             "@context": "https://schema.org",
             "@type": "Organization",
             name: "Seniors Better",
-            url: "https://www.seniorsbetter.com/",
+            url: "https://seniorsbetter.com/",
             logo: "https://bunchthings.com/site-logo/seniorsbetter/seniorsbetter-logo-144.png",
             sameAs: this.$sameAs,
             ContactPoint: [],
@@ -36,10 +36,10 @@ export default {
             "@context": "https://schema.org",
             "@type": "WebSite",
             name: "Seniors Better",
-            url: "https://www.seniorsbetter.com/",
+            url: "https://seniorsbetter.com/",
             potentialAction: {
               "@type": "SearchAction",
-              target: "https://www.seniorsbetter.com/search/?query={search_term_string}",
+              target: "https://seniorsbetter.com/search/?query={search_term_string}",
               "query-input": "required name=search_term_string"
             }
           }
@@ -49,7 +49,7 @@ export default {
         {
           rel:'canonical',
           hid: "canonical",
-          href:`https://www.seniorsbetter.com${this.$nuxt.context.route.path}`
+          href:`https://seniorsbetter.com${this.$nuxt.context.route.path}`
         }
       ],
     };

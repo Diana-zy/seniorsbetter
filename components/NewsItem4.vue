@@ -1,5 +1,5 @@
 <template>
-  <CustomLink class="news-style-2" :to="`/${item.path_v2}/`">
+  <CustomLink class="news-style-2" :to="buildArticleUrl(item.path_v2)">
     <NuxtImg
       format="auto"
       fit="cover"
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { capitalizeFirstLetter } from "~/utils/utils";
+import { capitalizeFirstLetter, buildArticleUrl } from "~/utils/utils";
 export default {
   props: {
     item: {
@@ -35,7 +35,8 @@ export default {
     }
   },
   methods: {
-    capitalizeFirstLetter
+    capitalizeFirstLetter,
+    buildArticleUrl
   }
 };
 </script>
@@ -106,6 +107,19 @@ export default {
       min-height: vw(96);
       margin-bottom: vw(26);
       @include ellipsis(2);
+    }
+    .news-author {
+      margin-top: vw(13);
+      font-size: vw(22);
+      padding-bottom: vw(11);
+      @include author-icon(vw(26), vw(26));
+      div:first-child {
+        max-width: vw(260);
+        @include ellipsis();
+      }
+      div:last-child {
+        @include ellipsis();
+      }
     }
   }
 }

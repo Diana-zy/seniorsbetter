@@ -15,19 +15,46 @@ export default {
     concurrency: 1,
     interval: 2000,
     async routes() {
-      const pathData = await fetch(
+      const fetchWithRetry = async (url, retries = 4, delay = 2000) => {
+        for (let i = 0; i < retries; i++) {
+          try {
+            return await fetch(url);
+          } catch (e) {
+            if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+            else throw e;
+          }
+        }
+      };
+      const pathData = await fetchWithRetry(
         `${process.env.PROD_API_URL}/api/article/get_all_path_v2?site_id=${process.env.SITE_ID}`
       );
       const path = await pathData.json();
       const categoryPaths = path.data.seo_category
         .filter((item) => item && String(item).trim())
         .map((item) => `/category/${item}/`);
-      // URL层级优化：保持 /detail/前缀，后端返回的path_v2已包含分类slug
       const detailPaths = path.data.detail
         .filter((item) => item && String(item).trim())
-        .map((item) => `/${item}/`);
-      const urls = [...categoryPaths, ...detailPaths];
-      return urls;
+        .map((item) => {
+          const s = String(item).trim();
+          // 2026-09-10实测get_all_path_v2真实返回确认的规律：
+          // SEO文章是"分类/urlslug-id"，不带前导斜杠，走两段式
+          // /:category/:detail路由（router.extendRoutes里注册的那条）；
+          // 非SEO文章(投放落地页)没有分类，是"/urlslug-id"这种带前导斜杠、
+          // 分类段为空字符串的格式(比如"/-8907"这种连slug都是空的)。
+          // 投放链接用的是纯数字id(/detail/{id}/，参考
+          // ad_delivery/delivery_link.py)，不是带slug的完整路径，要从
+          // slug里按最后一个"-"切出id，构建成/detail/{id}/，走
+          // pages/detail/_detail.vue默认文件路由/detail/:detail，
+          // 跟_detail.vue的asyncData()解析id用的是同一套规则
+          if (s.startsWith("/")) {
+            const slug = s.slice(1);
+            const lastDashIndex = slug.lastIndexOf("-");
+            const id = lastDashIndex >= 0 ? slug.substring(lastDashIndex + 1) : slug;
+            return `/detail/${id}/`;
+          }
+          return `/${s}/`;
+        });
+      return [...categoryPaths, ...detailPaths];
     }
   },
   axios: {
@@ -101,22 +128,54 @@ export default {
     "~/plugins/nav-data"
   ],
   components: true,
-  buildModules: ["@nuxtjs/style-resources", "@nuxt/image", "@nuxtjs/pwa"],
+  buildModules: ["@nuxt/image", "@nuxtjs/pwa"],
   css: ["@/assets/css/fonts.css", "@/assets/css/reset.css", "@/assets/css/common.scss"],
-  styleResources: {
-    scss: ["~/assets/css/_mixins.scss"]
-  },
   modules: ["@nuxtjs/axios"],
+  // SEO_FLAGS_FILE：详情页构建期(asyncData，process.server && process.static)
+  // 顺手记录每个路径的is_seo，供下面sitemap生成时过滤用。这个文件名两处都
+  // 引用到（这里 + pages/detail/_detail.vue），改动时要同步改
   hooks: {
+    // 每次构建开始时先清空/重建，不能只依赖generate:done跑完后删除——
+    // 用的是长期复用的自托管runner，上次构建如果中途崩溃(比如某个detail页
+    // asyncData()抛异常)，删除那一步会跑不到，残留的旧数据可能被这一次
+    // 构建误读，把已经不存在或is_seo已变化的路径混进新sitemap
+    'generate:before'() {
+      const nodePath = require('path')
+      const fs = require('fs')
+      const seoFlagsFile = nodePath.join(__dirname, '.seo-flags.jsonl')
+      try {
+        fs.writeFileSync(seoFlagsFile, '')
+      } catch (e) {}
+    },
     'generate:done'(generator) {
       const nodePath = require('path')
       const fs = require('fs')
-      const hostname = 'https://www.seniorsbetter.com'
+      const hostname = 'https://seniorsbetter.com'
       const today = new Date().toISOString().split('T')[0]
+      const seoFlagsFile = nodePath.join(__dirname, '.seo-flags.jsonl')
 
-      const routes = [...generator.generatedRoutes].filter(
-        (r) => r && typeof r === 'string' && !r.includes(':')
-      )
+      // 投放专用落地页文章(is_seo=false/0)不应该出现在sitemap里——读detail页
+      // 构建期记录下来的is_seo，只有明确读到false/0才排除；没记录到的路径
+      // (分类页本来就不走这套逻辑、或者某个detail页asyncData失败没记录到)
+      // 默认放行，不能因为缺记录就误伤
+      const seoFlags = new Map()
+      try {
+        const raw = fs.readFileSync(seoFlagsFile, 'utf8')
+        raw.split('\n').filter(Boolean).forEach((line) => {
+          try {
+            const { path: p, is_seo } = JSON.parse(line)
+            seoFlags.set(p, is_seo)
+          } catch (e) {}
+        })
+      } catch (e) {}
+
+      const routes = [...generator.generatedRoutes]
+        .filter((r) => r && typeof r === 'string' && !r.includes(':'))
+        .filter((r) => {
+          if (!seoFlags.has(r)) return true
+          const v = seoFlags.get(r)
+          return !(v === false || v === 0)
+        })
 
       const urlEntries = routes
         .map(
@@ -133,6 +192,10 @@ export default {
 
       const outputPath = nodePath.join(generator.options.generate.dir, 'sitemap.xml')
       fs.writeFileSync(outputPath, xml, 'utf8')
+
+      try {
+        fs.unlinkSync(seoFlagsFile)
+      } catch (e) {}
     }
   },
   pwa: {
@@ -147,6 +210,11 @@ export default {
     }
   },
   build: {
+    loaders: {
+      scss: {
+        additionalData: '@import "~/assets/css/_mixins.scss";'
+      }
+    },
     html: {
       minify: {
         collapseWhitespace: true,

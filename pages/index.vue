@@ -46,7 +46,7 @@
 <script>
 import { directive } from "vue-awesome-swiper";
 import "swiper/css/swiper.min.css";
-import { simulateAFSSearch } from "~/utils/utils";
+import { simulateAFSSearch, filterSeoArticles } from "~/utils/utils";
 
 export default {
   directives: {
@@ -59,16 +59,17 @@ export default {
           $axios.$get("/api/article/menu", {
             params: {
               site_id: env.SITE_ID,
-              mod_id: "rec"
+              mod_id: "rec",
+              size: 20
             }
-          }),
+          }).catch(() => null),
           $axios.$get("/api/article/get_all_articles", {
             params: {
               site_id: env.SITE_ID,
-              size: 4,
+              size: 20,
               page: 1
             }
-          }),
+          }).catch(() => null),
           $axios.$get("/api/article/menu", {
             params: {
               site_id: env.SITE_ID,
@@ -76,12 +77,12 @@ export default {
               page: 1,
               size: 4
             }
-          }),
+          }).catch(() => null),
           $axios.$get("/api/article/get_all_seo_category", {
             params: {
               site_id: env.SITE_ID
             }
-          })
+          }).catch(() => null)
         ]);
 
       const categoryItems = (categoryResponse && categoryResponse.list) || [];
@@ -93,15 +94,25 @@ export default {
             size: 4,
             page: 1
           }
-        })
+        }).catch(() => null)
       );
       const list = await Promise.all(category);
+
+      // 首页展示的这几个列表都要过滤掉非SEO文章(投放落地页)，避免混进
+      // 正常内容展示、影响站点SEO效果
+      if (recNewsResponse) recNewsResponse.list = filterSeoArticles(recNewsResponse.list);
+      if (trendingNewsResponse) trendingNewsResponse.list = filterSeoArticles(trendingNewsResponse.list).slice(0, 4);
+      if (allNewsResponse) allNewsResponse.list = filterSeoArticles(allNewsResponse.list);
+      const filteredList = list.map((item) => {
+        if (item) item.list = filterSeoArticles(item.list);
+        return item;
+      });
 
       return {
         recNews: recNewsResponse,
         trendingNews: trendingNewsResponse,
         allNews: allNewsResponse,
-        categoryList: list.filter((item) => item != null)
+        categoryList: filteredList.filter((item) => item != null)
       };
     } catch (error) {
       console.error("Error fetching data:", error);
