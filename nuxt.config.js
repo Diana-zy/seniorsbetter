@@ -1,5 +1,7 @@
 import TerserPlugin from "terser-webpack-plugin";
 import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
+import { authorData } from "./config/author-links";
+import { toAuthorSlug } from "./utils/utils";
 
 export default {
   target: "static",
@@ -54,7 +56,10 @@ export default {
           }
           return `/${s}/`;
         });
-      return [...categoryPaths, ...detailPaths];
+      const authorPaths = Object.keys(authorData).map(
+        (id) => `/author/${toAuthorSlug(authorData[id].name, id)}/`
+      );
+      return [...categoryPaths, ...detailPaths, ...authorPaths];
     }
   },
   axios: {
