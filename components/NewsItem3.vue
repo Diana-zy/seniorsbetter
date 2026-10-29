@@ -1,5 +1,5 @@
 <template>
-  <CustomLink class="news-style-3" :to="`/${item.path_v2}/`">
+  <CustomLink class="news-style-3" :to="buildArticleUrl(item.path_v2)">
     <p class="title">{{ item.name }}</p>
     <p class="path">/detail/{{ item.path }}/</p>
     <p class="desc">{{ item.first_paragraph }}</p>
@@ -7,12 +7,16 @@
 </template>
 
 <script>
+import { buildArticleUrl } from "~/utils/utils";
 export default {
   props: {
     item: {
       type: Object,
       required: true
     }
+  },
+  methods: {
+    buildArticleUrl
   }
 };
 </script>

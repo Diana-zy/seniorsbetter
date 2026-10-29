@@ -1,5 +1,5 @@
 <template>
-  <CustomLink class="news-style-1" :to="`/${item.path_v2}/`">
+  <CustomLink class="news-style-1" :to="buildArticleUrl(item.path_v2)">
     <NuxtImg
       format="auto"
       fit="cover"
@@ -25,12 +25,16 @@
 </template>
 
 <script>
+import { buildArticleUrl } from "~/utils/utils";
 export default {
   props: {
     item: {
       type: Object,
       required: true
     }
+  },
+  methods: {
+    buildArticleUrl
   }
 };
 </script>

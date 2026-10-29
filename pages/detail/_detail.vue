@@ -8,7 +8,12 @@
           <article class="article" v-if="newInfo">
             <h1 class="article-title" style="">{{ newInfo.name }}</h1>
             <div class="news-author">
-              <div>{{ newInfo.author?.name }}</div>
+              <nuxt-link
+                v-if="newInfo.author && newInfo.author.id"
+                :to="`/author/${toAuthorSlug(newInfo.author.name, newInfo.author.id)}/`"
+                class="author-link"
+              >{{ newInfo.author.name }}</nuxt-link>
+              <span v-else>{{ newInfo.author && newInfo.author.name }}</span>
               <div>{{ newInfo.updated_at }}</div>
             </div>
             <div class="news-detail first_paragraph">{{ newInfo.first_paragraph }}</div>
@@ -60,7 +65,7 @@
               </div>
             </section>
           </article>
-          <section v-if="newInfo?.related_articles?.length">
+          <section v-if="newInfo && newInfo.related_articles && newInfo.related_articles.length">
             <h3 class="title-h2">Related Articles</h3>
             <div class="related-articles">
               <news-item-5 v-for="(item, i) in newInfo.related_articles" :key="i" :item="item">
@@ -78,7 +83,7 @@
 </template>
 
 <script>
-import { shuffleArray, capitalizeFirstLetter } from "../../utils/utils";
+import { shuffleArray, capitalizeFirstLetter, toAuthorSlug, filterSeoArticles, buildArticleUrl } from "../../utils/utils";
 import Breadcrumb from "../../components/Breadcrumb";
 import CustomLink from "../../components/CustomLink";
 import ItemModeNew from "../../components/Item/ModeNew";
@@ -102,6 +107,11 @@ export default {
             related_num: 3
           }
         });
+        if (data && data.related_articles) {
+          // 相关文章推荐里也要排除非SEO文章(投放落地页)——SEO文章不该
+          // 内链到投放落地页，避免影响站点SEO效果
+          data.related_articles = filterSeoArticles(data.related_articles);
+        }
       } catch (detailError) {
         console.error(`Failed to fetch detail for ID ${id}:`, detailError);
         return {
@@ -142,7 +152,8 @@ export default {
           $axios.$get("/api/article/menu", {
             params: {
               site_id: env.SITE_ID,
-              mod_id: "rec"
+              mod_id: "rec",
+              size: 20
             }
           }).catch(err => {
             console.error("recNews API error:", err.message);
@@ -151,7 +162,7 @@ export default {
           $axios.$get("/api/article/get_all_articles", {
             params: {
               site_id: env.SITE_ID,
-              size: 4,
+              size: 20,
               page: 1
             }
           }).catch(err => {
@@ -193,7 +204,9 @@ export default {
       const { toc: flatToc, htmlWithAnchor: rawHtml } = processHtmlWithToc(data.content, [2]);
       const toc = generateNestedToc(flatToc);
 
-      let htmlWithAnchor = rawHtml;
+      let htmlWithAnchor = rawHtml
+        .replace(/(<table)/g, '<div class="table-scroll-wrapper">$1')
+        .replace(/<\/table>/g, '</table></div>');
       const pEnds = [];
       const pRegex = /<\/p>/gi;
       let pMatch;
@@ -220,15 +233,45 @@ export default {
         }
       ];
 
+      // 构建期(nuxt generate)顺手记一笔is_seo，供nuxt.config.js生成sitemap时
+      // 排除投放落地页用——这个页面本来就要请求一次/api/article/detail，
+      // 不产生额外请求。process.server && process.static保证只在构建期跑，
+      // 不影响dev模式/客户端导航。文件名要跟nuxt.config.js里的保持一致
+      //
+      // 记录的path必须跟routes()里实际生成出来的路径完全一致，sitemap过滤
+      // 才能靠路径匹配上这条记录：SEO文章走/:category/:detail两段式路由，
+      // 真实路径是/{category}/{detail}/；非SEO文章走/detail/:detail单段式
+      // 路由，routes()给它们生成的就是/detail/{纯数字id}/——这里path
+      // (=params.detail)在这种情况下访问到的本来就已经是这个纯id，两边
+      // 天然一致，不需要再额外解析一次
+      if (process.server && process.static) {
+        try {
+          const fs = require("fs");
+          const nodePath = require("path");
+          // 用process.cwd()而不是__dirname——.vue文件的<script>会经过webpack
+          // 打包，__dirname在打包产物里不保证还是源码目录的真实路径，
+          // process.cwd()是运行时的真实进程当前目录，构建时就是项目根目录，
+          // 跟nuxt.config.js里的__dirname(项目根目录)能对上
+          const seoFlagsFile = nodePath.join(process.cwd(), ".seo-flags.jsonl");
+          const realPath =
+            data.is_seo && params.category
+              ? `/${params.category}/${path}/`
+              : `/detail/${path}/`;
+          fs.appendFileSync(seoFlagsFile, JSON.stringify({ path: realPath, is_seo: data.is_seo }) + "\n");
+        } catch (e) {}
+      }
+
+      // 侧边栏/相关文章这几个列表都要过滤掉非SEO文章(投放落地页)，避免混进
+      // 正常内容展示、影响站点SEO效果
       return {
         newInfo: data,
         all: allResponse,
-        floatArray: shuffleArray(allResponse?.list?.slice() || []),
+        floatArray: shuffleArray(filterSeoArticles(allResponse?.list?.slice() || [])),
         toc,
         id,
         htmlWithAnchor,
-        recNews: extractList(recNewsResponse),
-        trendingNews: extractList(trendingNewsResponse),
+        recNews: filterSeoArticles(extractList(recNewsResponse)),
+        trendingNews: filterSeoArticles(extractList(trendingNewsResponse)).slice(0, 4),
         articleFaqs
       };
     } catch (error) {
@@ -255,9 +298,19 @@ export default {
   head() {
     const seoTitle = this.newInfo?.seo_title || this.newInfo?.name;
     const seoDesc = this.newInfo?.seo_desc;
+    // is_seo字段在文章创建时就定好、不会被后续上架/渠道绑定流程覆盖（BI后端
+    // 2026-09-09确认），用它区分"真SEO文章"和"投放落地页"——不是SEO文章
+    // 就不参与本站SEO索引体系，加noindex。这里只在明确拿到is_seo=false/0
+    // 时才加noindex，字段缺失(undefined/null，比如接口异常没返回)时不加——
+    // 避免因为接口临时缺字段就把正常SEO文章也一起隔离掉
+    const isNonSeoArticle =
+      this.newInfo && (this.newInfo.is_seo === false || this.newInfo.is_seo === 0);
     return {
       title: seoTitle ? `${seoTitle} - Seniors Better` : "Seniors Better",
       meta: [
+        ...(isNonSeoArticle
+          ? [{ hid: "robots", name: "robots", content: "noindex, nofollow" }]
+          : []),
         {
           hid: "description",
           name: "description",
@@ -276,7 +329,7 @@ export default {
         {
           hid: "og:url",
           property: "og:url",
-          content: `https://seniorsbetter.com/${this.newInfo?.path_v2}/`
+          content: `https://seniorsbetter.com${buildArticleUrl(this.newInfo?.path_v2)}`
         },
         {
           hid: "og:locale",
@@ -311,7 +364,7 @@ export default {
         {
           hid: "twitter:url",
           property: "twitter:url",
-          content: `https://seniorsbetter.com/${this.newInfo?.path_v2}/`
+          content: `https://seniorsbetter.com${buildArticleUrl(this.newInfo?.path_v2)}`
         },
         {
           hid: "twitter:locale",
@@ -353,18 +406,21 @@ export default {
                 "@type": "Person",
                 name: this.newInfo?.author?.name || "",
                 description: this.newInfo?.author?.intro || "",
-                image: `https://bunchthings.com/${this.newInfo?.author?.avatar || ""}`
+                image: `https://bunchthings.com/${this.newInfo?.author?.avatar || ""}`,
+                url: this.newInfo?.author?.id
+                  ? `https://seniorsbetter.com/author/${toAuthorSlug(this.newInfo.author.name, this.newInfo.author.id)}/`
+                  : undefined
               }
             ],
             mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": `https://www.seniorsbetter.com/${this.newInfo?.path_v2 || ""}/`
+              "@id": `https://seniorsbetter.com${this.newInfo?.path_v2 ? buildArticleUrl(this.newInfo.path_v2) : "/"}`
             },
             publisher: {
               "@type": "NewsMediaOrganization",
               name: "Seniors Better",
-              url: "https://www.seniorsbetter.com",
-              publishingPrinciples: "https://www.seniorsbetter.com/us/",
+              url: "https://seniorsbetter.com",
+              publishingPrinciples: "https://seniorsbetter.com/us/",
               sameAs: this.$sameAs
             },
             image: [
@@ -383,7 +439,7 @@ export default {
                 "@type": "ListItem",
                 position: 1,
                 item: {
-                  "@id": "https://www.seniorsbetter.com/",
+                  "@id": "https://seniorsbetter.com/",
                   name: "Home"
                 }
               },
@@ -391,7 +447,7 @@ export default {
                 "@type": "ListItem",
                 position: 2,
                 item: {
-                  "@id": `https://www.seniorsbetter.com/category/${this.newInfo?.category_id || ""}/`,
+                  "@id": `https://seniorsbetter.com/category/${this.newInfo?.category_id || ""}/`,
                   name: this.newInfo?.category_name || ""
                 }
               },
@@ -399,7 +455,7 @@ export default {
                 "@type": "ListItem",
                 position: 3,
                 item: {
-                  "@id": `https://www.seniorsbetter.com/${this.newInfo?.path_v2 || ""}/`,
+                  "@id": `https://seniorsbetter.com${this.newInfo?.path_v2 ? buildArticleUrl(this.newInfo.path_v2) : "/"}`,
                   name: this.newInfo?.name || ""
                 }
               }
@@ -412,12 +468,28 @@ export default {
 
   mounted: function () {
     this.handleCreateTableParentDom();
-    this.channelId = this.newInfo?.channel || "";
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has("channel")) {
+      this.channelId = searchParams.get("channel");
+    } else {
+      this.channelId = this.newInfo?.channel || "";
+      // URL本身没带channel、从文章配置兜底取到的情况下，不改当前URL（避免
+      // 碰到SEO文章的地址栏），改成写一个当次访问的短期cookie，供
+      // handleRequestAdByChannel()在URL读不到channel时兜底读取——保证
+      // 详情页和后续结果页对同一次访问判断出一致的channel，不然详情页记录
+      // 的漏斗状态和结果页读到的channel对不上号，广告请求会被误挡
+      if (this.channelId !== "") {
+        window.setCookie("hi_channel_fallback", this.channelId, 1);
+      }
+    }
+    window.handleRequestAdByChannel("mounted", 1);
     this.$nextTick(() => {
       this.handleAdsScript();
     });
   },
   methods: {
+    toAuthorSlug,
+    capitalizeFirstLetter,
     scrollToAnchor(anchorId) {
       const target = document.getElementById(anchorId);
       if (!target) return;
@@ -483,6 +555,7 @@ export default {
             if (response) {
               window.trackEventToPixel("D_C_AC");
               window.pushEventParamsToGtm("C_AC");
+              window.handleRequestAdByChannel("query_ad", 1);
               const hi_user_source = window.getValueByURLOrCookie("hi_source");
               if (hi_user_source === "unknown") {
                 window.dataLayer.push({
@@ -524,24 +597,28 @@ export default {
       );
     },
     handleCreateTableParentDom() {
-      let dom = document.getElementsByClassName("table-container")?.[0];
-      if (dom) {
-        let newParent = document.createElement("div");
-        newParent.setAttribute("class", "table-container-parent");
-        let parent = dom.parentNode;
-        parent.insertBefore(newParent, dom);
-        newParent.appendChild(dom);
-      }
-    },
-    capitalizeFirstLetter
+      let doms = Array.from(document.querySelectorAll(".news-detail table"));
+      doms.forEach(dom => {
+        dom.classList.add("table-container");
+        if (!dom.parentNode.classList.contains("table-container-parent")) {
+          let newParent = document.createElement("div");
+          newParent.setAttribute("class", "table-container-parent");
+          let parent = dom.parentNode;
+          parent.insertBefore(newParent, dom);
+          newParent.appendChild(dom);
+        }
+      });
+    }
   }
 };
 </script>
 
 <style lang="scss">
+::v-deep .table-scroll-wrapper,
 ::v-deep .table-container-parent {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .news-author {
   display: flex;
@@ -550,10 +627,19 @@ export default {
   font-size: 14px;
   padding-bottom: 16px;
   @include author-icon(25px, 25px);
+
+  .author-link {
+    color: inherit;
+    text-decoration: none;
+    &:hover {
+      color: $color1;
+    }
+  }
 }
 ::v-deep .table-container {
   position: relative;
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   margin: 24px 0;
   border-top: 3px solid rgba($font3, 0.65);
   border-collapse: collapse;
@@ -562,6 +648,7 @@ export default {
     padding: 10px;
     height: 61px;
     td {
+      min-width: 120px;
       background: rgba(#fd9a25, 0.1);
       border: 2px solid #fff;
       font-size: 14px;
@@ -574,6 +661,7 @@ export default {
   }
   tr:first-child {
     th,td {
+      min-width: 120px;
       color: $font5;
       font-size: 16px;
       border-bottom: 3px solid rgba($font3, 0.35);
@@ -631,8 +719,6 @@ export default {
 }
 .news-detail {
   color: $font5;
-  p {
-  }
 }
 .read-more {
   line-height: 4;
@@ -740,14 +826,13 @@ export default {
   }
   ::v-deep .table-container {
     margin: vw(30) 0;
-    width: max-content;
-    min-width: 100%;
     border-top: vw(4) solid rgba($font3, 0.65);
     tr {
       text-align: center;
       padding: vw(20);
       min-height: vw(122);
       td {
+        min-width: vw(200);
         background: rgba(#fd9a25, 0.1);
         border: vw(4) solid #fff;
         font-size: vw(28);

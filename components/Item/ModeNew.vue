@@ -1,15 +1,22 @@
 <template>
-  <CustomLink :to="`/${item.path_v2}/`">
+  <CustomLink :to="buildArticleUrl(item.path_v2)">
     <div class="mode-new">
       <div>
         <div class="img-box">
           <NuxtImg
+            v-if="item.cover"
             format="auto"
             fit="cover"
             width="140"
-            :src="item.cover || '/icon.png'"
+            :src="item.cover"
             :alt="item.cover_seo_alt"
             loading="lazy"
+            class="img"
+          />
+          <img
+            v-else
+            src="/icon.png"
+            :alt="item.cover_seo_alt"
             class="img"
           />
         </div>
@@ -27,7 +34,7 @@
 </template>
 
 <script>
-import { capitalizeFirstLetter } from "~/utils/utils";
+import { capitalizeFirstLetter, buildArticleUrl } from "~/utils/utils";
 export default {
   name: "ModeNew",
   props: {
@@ -37,7 +44,8 @@ export default {
     }
   },
   methods: {
-    capitalizeFirstLetter
+    capitalizeFirstLetter,
+    buildArticleUrl
   }
 };
 </script>

@@ -50,7 +50,7 @@ export default {
   data() {
     return {
       input: "",
-      icon: "/logo.png"
+      icon: require("~/assets/images/logo.png")
     };
   },
   computed: {
@@ -111,9 +111,9 @@ export default {
   color: rgba(#000, 0.65);
   .icon-logo {
     width: 212px;
-    height: 32px;
+    height: auto;
     margin-bottom: 20px;
-    img { object-fit: cover; width: 100%; height: 100%; }
+    img { object-fit: contain; width: 100%; height: auto; }
   }
   .website-info {
     font-size: 16px;
@@ -147,7 +147,7 @@ export default {
   .footer {
     position: relative;
     margin-top: vw(32);
-    .icon-logo { margin-left: vw(32); width: vw(320); height: vw(48); }
+    .icon-logo { margin-left: vw(32); width: vw(320); height: auto; }
     .website-info {
       padding: 0 vw(32);
       line-height: 1.5;
